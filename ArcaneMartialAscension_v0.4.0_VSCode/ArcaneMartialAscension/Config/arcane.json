@@ -1,0 +1,8 @@
+{
+  "targetWorldBoxVersion": "0.51.4",
+  "circleXpThresholds": [0, 100, 250, 500, 900, 1500, 2400, 3600, 5200, 7500],
+  "traditions": ["Wizard", "Warlock", "Sorcerer"],
+  "sorcererOrigins": ["Draconic", "Elemental", "Fey", "Wild"],
+  "exampleSpells": [{"id": "ama.arcane_spark", "school": "Evocation", "circle": 1, "manaCost": 10}],
+  "notes": "Design reference only; these settings are not yet loaded dynamically by the prototype."
+}

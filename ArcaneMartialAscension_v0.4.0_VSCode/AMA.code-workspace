@@ -1,0 +1,12 @@
+{
+  "folders": [ { "name": "Arcane & Martial Ascension", "path": "." } ],
+  "settings": {
+    "files.encoding": "utf8",
+    "files.eol": "\n",
+    "editor.formatOnSave": false,
+    "search.exclude": { "**/bin": true, "**/obj": true }
+  },
+  "extensions": {
+    "recommendations": [ "ms-dotnettools.csharp", "ms-dotnettools.csdevkit", "eamodio.gitlens" ]
+  }
+}

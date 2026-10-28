@@ -1,0 +1,10 @@
+{
+  "name": "Arcane & Martial Ascension",
+  "GUID": "com.arcane.martial.ascension",
+  "author": "Arcane Martial Team",
+  "version": "0.4.0",
+  "description": "0.4 alpha: 160 embedded spells, 4 weapon mastery trees and GUI VFX fallback for WorldBox 0.51.2 / NeoModLoader 1.2.1.1. Experimental.",
+  "Dependencies": [],
+  "OptionalDependencies": [],
+  "IncompatibleWith": []
+}

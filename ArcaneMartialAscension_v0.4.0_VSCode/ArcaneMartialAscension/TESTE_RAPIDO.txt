@@ -1,0 +1,14 @@
+ARCANE & MARTIAL ASCENSION v0.4.0 ALPHA
+WorldBox 0.51.2, NML 1.2.1.1
+
+Coloque a pasta ArcaneMartialAscension dentro de Mods. Não misture com v0.3.3.
+
+TESTE 1: F5 -> circulo laranja DEVE aparecer ao redor do cursor. Sem unidades ou mana.
+TESTE 2: Aponte para o mago, F7. Aponte para o inimigo, F8 (Evocacao/Centelha Rubra).
+TESTE 3: Escolha outra escola/magia, clique Aprender. Feiticos de circulo 0/1 selecionados podem usar mecanicas basicas.
+TESTE 4: F9 treina arma, F11 alterna Espada/Lanca/Arco/Machado, XP e nivel visiveis no painel.
+TESTE 5: Se falhar, envie Player.log/Player-prev.log.
+
+160 MAGIAS INCLUIDAS NO CODIGO (SpellCatalog.cs).
+ATENCAO: Nao significa que todos os 160 efeitos estao finalizados. Os feitiços avancados estao registrados, mas bloqueados sem gasto de mana ate haver implementacao.
+Progressao nao salva. Nao testado no jogo real ainda.

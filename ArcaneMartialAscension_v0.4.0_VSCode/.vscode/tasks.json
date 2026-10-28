@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "AMA: 1 - Validar catálogo e estrutura",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\validate.ps1" ],
+      "problemMatcher": [],
+      "group": { "kind": "test", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "AMA: 2 - Compilar C# (DLLs locais)",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\build.ps1" ],
+      "problemMatcher": [ "$msCompile" ],
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "AMA: 3 - Instalar fontes no WorldBox",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\install.ps1" ],
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "AMA: 4 - Ver erros do Player.log",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\logs.ps1" ],
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# IDE / compilacao local
+.vs/
+.vscode/.history/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.tmp
+*.log
+# Arquivos copiados de jogos nao pertencem ao repositorio
+*.dll
+*.pdb
+# Cache
+__pycache__/
+.pytest_cache/
+.DS_Store

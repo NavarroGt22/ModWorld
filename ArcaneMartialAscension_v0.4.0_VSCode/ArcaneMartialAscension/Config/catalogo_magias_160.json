@@ -1,0 +1,4733 @@
+{
+  "nome": "Arcane & Martial Ascension — Grimorio Completo",
+  "versao_documentacao": "0.4.0-design",
+  "alvo": "WorldBox 0.51.2 / NeoModLoader 1.2.1.1",
+  "estado": "catalogo de design; NAO e um mod executavel; nenhuma magia listada esta automaticamente implementada",
+  "principios": {
+    "tradicoes": [
+      "Mago",
+      "Bruxo",
+      "Feiticeiro"
+    ],
+    "escolas": [
+      "Abjuração",
+      "Conjuração",
+      "Adivinhação",
+      "Encantamento",
+      "Evocação",
+      "Ilusão",
+      "Necromancia",
+      "Transmutação"
+    ],
+    "circulos": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "mana_maxima_sugerida": "100 + 35 * circulo_maximo_desbloqueado (maximo 415 no circulo 9)",
+    "regen_mana_sugerida": "3 + 0.6 * circulo por segundo fora de combate; em combate 50%",
+    "escala_potencia_sugerida": "4 + 5 * circulo + 2 * circulo^2, antes de atributos e resistencias",
+    "regra_lancamento": "confirmar caster, traço da escola, círculo desbloqueado, magia aprendida, mana suficiente, alvo valido, alcance e cooldown; somente entao consumir mana",
+    "progresso": "o circulo nao sobe ao apertar F8; progride com estudo, experiencia ou treinamento definido",
+    "limite_simultaneo": "limitar efeitos visuais e invocações globais e por conjurador; bosses resistentes a hard crowd-control",
+    "circulo_0": "truques simples usam 3 mana para evitar spam infinito",
+    "nota_mana": "os custos sao propostos, ainda precisam de balanceamento com atributos reais do WorldBox"
+  },
+  "magias": [
+    {
+      "id": "ama.spell.abjuration.0.centelha_guardia",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 0,
+      "nome": "Centelha Guardiã",
+      "descricao": "Concede um pequeno escudo temporário a uma unidade.",
+      "categoria": "escudo",
+      "tipo_alvo": "ally",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "absorver dano sem exceder o valor do escudo",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.0.repulsao_runica",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 0,
+      "nome": "Repulsão Rúnica",
+      "descricao": "Empurra levemente o atacante mais próximo, sem causar dano.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.1.escudo_prismatico",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 1,
+      "nome": "Escudo Prismático",
+      "descricao": "Absorve dano recebido pelo alvo até romper ou expirar.",
+      "categoria": "escudo",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "absorver dano sem exceder o valor do escudo",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.1.passo_da_muralha",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 1,
+      "nome": "Passo da Muralha",
+      "descricao": "Reduz o próximo golpe recebido e concede resistência breve.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.2.circulo_antifeitico",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 2,
+      "nome": "Círculo Antifeitiço",
+      "descricao": "Remove um encantamento negativo de baixa intensidade.",
+      "categoria": "dissipacao",
+      "tipo_alvo": "ally",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "remover efeitos temporarios conforme nivel de magia",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.2.bastiao_de_pedra",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 2,
+      "nome": "Bastião de Pedra",
+      "descricao": "Cria barreira temporária que impede passagem de projéteis.",
+      "categoria": "barreira",
+      "tipo_alvo": "point",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.3.egide_da_companhia",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 3,
+      "nome": "Égide da Companhia",
+      "descricao": "Distribui proteção entre aliados próximos, até seis unidades.",
+      "categoria": "escudo",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "absorver dano sem exceder o valor do escudo",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.3.quebra_de_maldicao",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 3,
+      "nome": "Quebra de Maldição",
+      "descricao": "Remove efeitos de medo, veneno mágico ou enfraquecimento de aliados.",
+      "categoria": "dissipacao",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "remover efeitos temporarios conforme nivel de magia",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.4.cupula_das_sete_runas",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 4,
+      "nome": "Cúpula das Sete Runas",
+      "descricao": "Cria domo defensivo sobre um grupo pequeno.",
+      "categoria": "barreira",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.4.espelho_arcano",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 4,
+      "nome": "Espelho Arcano",
+      "descricao": "Reflete um projétil mágico, limitado a magia de círculo igual ou inferior.",
+      "categoria": "reflexao",
+      "tipo_alvo": "ally",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "refletir ataque com limite de dano refletido",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.5.ancora_planar",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 5,
+      "nome": "Âncora Planar",
+      "descricao": "Impede teleporte e invocações hostis dentro da área.",
+      "categoria": "barreira",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.5.muralha_de_silencio",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 5,
+      "nome": "Muralha de Silêncio",
+      "descricao": "Interrompe conjurações dentro da faixa protegida.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.6.fortaleza_viva",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 6,
+      "nome": "Fortaleza Viva",
+      "descricao": "Mantém escudos regenerativos em até oito aliados.",
+      "categoria": "escudo",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "absorver dano sem exceder o valor do escudo",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.6.manto_inquebravel",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 6,
+      "nome": "Manto Inquebrável",
+      "descricao": "Reduz em até sessenta por cento o dano por duração curta.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 0,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.abjuration.7.dominio_do_lacre",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 7,
+      "nome": "Domínio do Lacre",
+      "descricao": "Bloqueia novas magias inimigas de círculo baixo dentro da zona.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.abjuration.7.ricochete_soberano",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 7,
+      "nome": "Ricochete Soberano",
+      "descricao": "Reflete uma fração do dano mágico recebido, com teto por conjuração.",
+      "categoria": "reflexao",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "refletir ataque com limite de dano refletido",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.abjuration.8.prisao_do_vazio",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 8,
+      "nome": "Prisão do Vazio",
+      "descricao": "Sela temporariamente a conjuração de um inimigo poderoso.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 0,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.abjuration.8.refugio_absoluto",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 8,
+      "nome": "Refúgio Absoluto",
+      "descricao": "Impede dano em até quatro aliados por poucos segundos; não protege de terreno letal.",
+      "categoria": "escudo",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "absorver dano sem exceder o valor do escudo",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.abjuration.9.lei_da_impenetrabilidade",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 9,
+      "nome": "Lei da Impenetrabilidade",
+      "descricao": "Ergue uma fortaleza arcana de área limitada, resistente a investidas.",
+      "categoria": "barreira",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.abjuration.9.banimento_da_catastrofe",
+      "escola": "Abjuração",
+      "escola_id": "abjuration",
+      "circulo": 9,
+      "nome": "Banimento da Catástrofe",
+      "descricao": "Cancela um feitiço de área já iniciado, se não exceder o nível do conjurador.",
+      "categoria": "dissipacao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "remover efeitos temporarios conforme nivel de magia",
+      "vfx": {
+        "forma": "circulo_abjuration",
+        "cor_hex": "#65E4EC",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Abjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.0.agulha_eterea",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 0,
+      "nome": "Agulha Etérea",
+      "descricao": "Invoca uma agulha espectral que perfura um inimigo.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 4,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.0.mao_passageira",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 0,
+      "nome": "Mão Passageira",
+      "descricao": "Cria uma mão de força que empurra um inimigo ou objeto próximo.",
+      "categoria": "controle",
+      "tipo_alvo": "point",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.1.lamina_invocada",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 1,
+      "nome": "Lâmina Invocada",
+      "descricao": "Cria arma espectral para um ataque à distância curta.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 11,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.1.sentinela_de_poeira",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 1,
+      "nome": "Sentinela de Poeira",
+      "descricao": "Invoca uma criatura frágil que distrai um inimigo.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.2.cao_de_cinzas",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 2,
+      "nome": "Cão de Cinzas",
+      "descricao": "Invoca um familiar veloz para atacar e farejar inimigos.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.2.seta_de_passagem",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 2,
+      "nome": "Seta de Passagem",
+      "descricao": "Teleporta uma unidade aliada por curta distância para posição livre.",
+      "categoria": "teleporte",
+      "tipo_alvo": "ally",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.3.portal_de_assalto",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 3,
+      "nome": "Portal de Assalto",
+      "descricao": "Desloca até três aliados para outra posição próxima e segura.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.3.guardiao_de_bronze",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 3,
+      "nome": "Guardião de Bronze",
+      "descricao": "Invoca um defensor temporário com alto bloqueio.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.4.chuva_de_lancas",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 4,
+      "nome": "Chuva de Lanças",
+      "descricao": "Materializa lanças sobre uma zona, causando dano múltiplo.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 56,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.4.passagem_geminada",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 4,
+      "nome": "Passagem Geminada",
+      "descricao": "Teleporta até cinco aliados entre dois pontos visíveis.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.5.cavaleiro_astral",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 5,
+      "nome": "Cavaleiro Astral",
+      "descricao": "Invoca uma unidade montada espectral com duração limitada.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.5.selo_de_reforco",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 5,
+      "nome": "Selo de Reforço",
+      "descricao": "Invoca três guerreiros etéreos para proteção local.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.6.legiao_de_vidro",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 6,
+      "nome": "Legião de Vidro",
+      "descricao": "Invoca até seis defensores frágeis por tempo limitado.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 0,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.6.ponte_do_vazio",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 6,
+      "nome": "Ponte do Vazio",
+      "descricao": "Abre passagem curta sobre água ou obstáculo para oito aliados.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.conjuration.7.colosso_de_obsidiana",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 7,
+      "nome": "Colosso de Obsidiana",
+      "descricao": "Invoca um guardião lento, grande e resistente.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 0,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.7.portal_de_cerco",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 7,
+      "nome": "Portal de Cerco",
+      "descricao": "Reposiciona até dez aliados num ponto sem ocupação inimiga.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.8.mare_de_invocados",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 8,
+      "nome": "Maré de Invocados",
+      "descricao": "Materializa até doze soldados efêmeros, sujeitos ao limite global de invocações.",
+      "categoria": "invocacao",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.8.teia_de_portais",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 8,
+      "nome": "Teia de Portais",
+      "descricao": "Encadeia três saltos curtos de um grupo aliado.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.9.hoste_do_firmamento",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 9,
+      "nome": "Hoste do Firmamento",
+      "descricao": "Invoca até dezesseis guardiões celestes temporários.",
+      "categoria": "invocacao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.conjuration.9.travessia_continental",
+      "escola": "Conjuração",
+      "escola_id": "conjuration",
+      "circulo": 9,
+      "nome": "Travessia Continental",
+      "descricao": "Reposiciona até vinte aliados entre dois pontos aliados previamente marcados.",
+      "categoria": "teleporte",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_conjuration",
+        "cor_hex": "#63D98D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Conjuração"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.0.lampejo_de_intencoes",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 0,
+      "nome": "Lampejo de Intenções",
+      "descricao": "Revela a direção aproximada de inimigos próximos.",
+      "categoria": "deteccao",
+      "tipo_alvo": "self",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.0.olho_de_poeira",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 0,
+      "nome": "Olho de Poeira",
+      "descricao": "Destaca temporariamente uma unidade escondida no alcance.",
+      "categoria": "deteccao",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.1.sentido_de_emboscada",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 1,
+      "nome": "Sentido de Emboscada",
+      "descricao": "Exibe inimigos ocultos próximos dos aliados.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 1,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 4,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.1.mapa_de_mana",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 1,
+      "nome": "Mapa de Mana",
+      "descricao": "Mostra o potencial mágico de uma unidade examinada.",
+      "categoria": "deteccao",
+      "tipo_alvo": "enemy",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.2.marca_de_pressagio",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 2,
+      "nome": "Marca de Presságio",
+      "descricao": "Aumenta a precisão do próximo ataque de um aliado.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.2.desvelar_miragens",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 2,
+      "nome": "Desvelar Miragens",
+      "descricao": "Remove ilusões básicas dentro de uma área pequena.",
+      "categoria": "dissipacao",
+      "tipo_alvo": "area",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 2,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 6,
+      "efeito_runtime_planejado": "remover efeitos temporarios conforme nivel de magia",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.3.visao_da_linha_de_tiro",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 3,
+      "nome": "Visão da Linha de Tiro",
+      "descricao": "Melhora temporariamente a precisão dos arqueiros aliados.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.3.prever_golpe",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 3,
+      "nome": "Prever Golpe",
+      "descricao": "Permite evitar uma única investida iminente.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.4.cartografia_viva",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 4,
+      "nome": "Cartografia Viva",
+      "descricao": "Revela movimentos inimigos próximos por curto período.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.4.leitura_de_fraqueza",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 4,
+      "nome": "Leitura de Fraqueza",
+      "descricao": "Marca um inimigo que passa a receber mais dano físico.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "enemy",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.5.oraculo_de_batalha",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 5,
+      "nome": "Oráculo de Batalha",
+      "descricao": "Melhora esquivas e contra-ataques de um pelotão aliado.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.5.espelho_distante",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 5,
+      "nome": "Espelho Distante",
+      "descricao": "Explora por alguns segundos um ponto remoto do mapa.",
+      "categoria": "deteccao",
+      "tipo_alvo": "point",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.6.nos_do_destino",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 6,
+      "nome": "Nós do Destino",
+      "descricao": "Protege um pequeno grupo contra um acerto crítico.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.6.profecia_da_ruptura",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 6,
+      "nome": "Profecia da Ruptura",
+      "descricao": "Destaca inimigos preparando feitiços de alto círculo.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.divination.7.ruptura_da_probabilidade",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 7,
+      "nome": "Ruptura da Probabilidade",
+      "descricao": "Faz ataques hostis na área errarem com mais frequência.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.7.convergencia_tatica",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 7,
+      "nome": "Convergência Tática",
+      "descricao": "Melhora o foco de alvo e a movimentação de aliados.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.8.mente_de_mil_olhos",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 8,
+      "nome": "Mente de Mil Olhos",
+      "descricao": "Revela unidades e armadilhas em uma ampla região.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.8.pressagio_de_extincao",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 8,
+      "nome": "Presságio de Extinção",
+      "descricao": "Destaca inimigos vulneráveis e concede evasão a aliados.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.9.decreto_do_inevitavel",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 9,
+      "nome": "Decreto do Inevitável",
+      "descricao": "Concede previsão de um golpe a até dez aliados; não garante vitória.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.divination.9.mapa_dos_futuros",
+      "escola": "Adivinhação",
+      "escola_id": "divination",
+      "circulo": 9,
+      "nome": "Mapa dos Futuros",
+      "descricao": "Mostra zonas prováveis de impacto de grandes feitiços por tempo curto.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_divination",
+        "cor_hex": "#F6D86D",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Adivinhação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.0.murmurio_de_calma",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 0,
+      "nome": "Murmúrio de Calma",
+      "descricao": "Retarda a próxima ação ofensiva de um inimigo.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.0.fio_de_simpatia",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 0,
+      "nome": "Fio de Simpatia",
+      "descricao": "Reduz a chance de um inimigo escolher o conjurador como alvo.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.1.ordem_breve",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 1,
+      "nome": "Ordem Breve",
+      "descricao": "Atordoa um inimigo por menos de um segundo, sujeito a resistência.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.1.coragem_encantada",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 1,
+      "nome": "Coragem Encantada",
+      "descricao": "Aumenta temporariamente a resistência ao medo de um aliado.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.2.medo_sussurrante",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 2,
+      "nome": "Medo Sussurrante",
+      "descricao": "Faz um inimigo recuar durante alguns instantes.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.2.laco_de_obediencia",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 2,
+      "nome": "Laço de Obediência",
+      "descricao": "Faz um inimigo comum lutar ao lado do conjurador por tempo curto.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.3.canto_da_harmonia",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 3,
+      "nome": "Canto da Harmonia",
+      "descricao": "Aumenta a recuperação de mana de aliados próximos.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.3.quebra_de_vontade",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 3,
+      "nome": "Quebra de Vontade",
+      "descricao": "Reduz velocidade e resistência mental de um inimigo.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "enemy",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.4.aura_de_tregua",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 4,
+      "nome": "Aura de Trégua",
+      "descricao": "Impede ataques de unidades comuns numa região por instantes.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.4.fervor_conquistador",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 4,
+      "nome": "Fervor Conquistador",
+      "descricao": "Aumenta a velocidade de ataque de aliados próximos.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.5.dominio_dos_sentidos",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 5,
+      "nome": "Domínio dos Sentidos",
+      "descricao": "Diminui bastante a precisão de inimigos na área.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.5.pacto_de_lealdade",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 5,
+      "nome": "Pacto de Lealdade",
+      "descricao": "Impede fuga por medo de aliados por curto período.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.6.palavra_de_silencio",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 6,
+      "nome": "Palavra de Silêncio",
+      "descricao": "Bloqueia a conjuração de um inimigo por alguns segundos.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 0,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.6.extase_marcial",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 6,
+      "nome": "Êxtase Marcial",
+      "descricao": "Concede velocidade de ataque e sinergia com maestria de espada.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.enchantment.7.comando_coral",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 7,
+      "nome": "Comando Coral",
+      "descricao": "Imobiliza por instantes até oito inimigos comuns.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.7.coroa_da_determinacao",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 7,
+      "nome": "Coroa da Determinação",
+      "descricao": "Protege aliados contra medo e controle mental.",
+      "categoria": "melhoria",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.8.decreto_do_esquecimento",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 8,
+      "nome": "Decreto do Esquecimento",
+      "descricao": "Remove vários reforços mágicos temporários de um inimigo.",
+      "categoria": "dissipacao",
+      "tipo_alvo": "enemy",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "remover efeitos temporarios conforme nivel de magia",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.8.marcha_hipnotica",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 8,
+      "nome": "Marcha Hipnótica",
+      "descricao": "Obriga até seis inimigos comuns a avançar rumo a ponto marcado.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.9.vontade_do_soberano",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 9,
+      "nome": "Vontade do Soberano",
+      "descricao": "Controla temporariamente até quatro inimigos comuns; não controla chefes.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.enchantment.9.juramento_de_paz",
+      "escola": "Encantamento",
+      "escola_id": "enchantment",
+      "circulo": 9,
+      "nome": "Juramento de Paz",
+      "descricao": "Suspende ataques em uma zona por até oito segundos.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_enchantment",
+        "cor_hex": "#EE8DE3",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Encantamento"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.0.centelha_rubra",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 0,
+      "nome": "Centelha Rubra",
+      "descricao": "Dispara pequena fagulha de fogo contra uma unidade.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 4,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.0.estilhaco_glacial",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 0,
+      "nome": "Estilhaço Glacial",
+      "descricao": "Lança fragmento de gelo que causa dano e lentidão curta.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 4,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.1.lanca_eletrica",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 1,
+      "nome": "Lança Elétrica",
+      "descricao": "Dispara raio elétrico instantâneo sobre um alvo.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 11,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.1.rajada_de_cinzas",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 1,
+      "nome": "Rajada de Cinzas",
+      "descricao": "Projeta cone curto de chamas e cinzas.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 1,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 11,
+      "limite_alvos": 4,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.2.onda_de_fogo",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 2,
+      "nome": "Onda de Fogo",
+      "descricao": "Incendeia uma área pequena por um instante.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 2,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 22,
+      "limite_alvos": 6,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.2.agulhas_de_gelo",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 2,
+      "nome": "Agulhas de Gelo",
+      "descricao": "Lança quatro fragmentos contra alvos próximos.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 22,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.3.meteoro_menor",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 3,
+      "nome": "Meteoro Menor",
+      "descricao": "Invoca impacto ardente com pequena explosão de área.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "point",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 37,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.3.corrente_de_trovao",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 3,
+      "nome": "Corrente de Trovão",
+      "descricao": "Raio atinge até três inimigos, perdendo força a cada salto.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 37,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.4.coluna_de_fogo",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 4,
+      "nome": "Coluna de Fogo",
+      "descricao": "Cria coluna flamejante numa zona marcada.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "point",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 56,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.4.cratera_de_granizo",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 4,
+      "nome": "Cratera de Granizo",
+      "descricao": "Causa dano de gelo e reduz a velocidade na zona.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 56,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.5.serpente_de_relampago",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 5,
+      "nome": "Serpente de Relâmpago",
+      "descricao": "Relâmpago encadeado pode atingir até cinco alvos.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 79,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.5.mare_vulcanica",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 5,
+      "nome": "Maré Vulcânica",
+      "descricao": "Onda larga de lava mágica causa dano e empurra.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 79,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.6.tempestade_ignea",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 6,
+      "nome": "Tempestade Ígnea",
+      "descricao": "Mantém chuva de chamas em região limitada.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 106,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.6.arco_solar",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 6,
+      "nome": "Arco Solar",
+      "descricao": "Dispara feixe de luz em linha reta atravessando inimigos.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 106,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.evocation.7.aurora_devastadora",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 7,
+      "nome": "Aurora Devastadora",
+      "descricao": "Descarrega uma grande faixa de energia radiante.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 137,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.7.chuva_de_estrelas",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 7,
+      "nome": "Chuva de Estrelas",
+      "descricao": "Convoca impactos sequenciais sobre uma zona.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 137,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.8.coracao_da_tempestade",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 8,
+      "nome": "Coração da Tempestade",
+      "descricao": "Cria zona elétrica persistente com raios periódicos.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 172,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.8.sol_despedacado",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 8,
+      "nome": "Sol Despedaçado",
+      "descricao": "Causa explosão solar forte seguida de queima breve.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "point",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 172,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.9.cataclismo_elemental",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 9,
+      "nome": "Cataclismo Elemental",
+      "descricao": "Três ondas consecutivas de fogo, gelo e raios sobre região ampla.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 211,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.evocation.9.estrela_do_julgamento",
+      "escola": "Evocação",
+      "escola_id": "evocation",
+      "circulo": 9,
+      "nome": "Estrela do Julgamento",
+      "descricao": "Invoca um impacto colossal em três estágios com aviso visual.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "point",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 211,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_evocation",
+        "cor_hex": "#FF8B52",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Evocação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.0.sombra_duplicada",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 0,
+      "nome": "Sombra Duplicada",
+      "descricao": "Cria imagem estacionária para desviar um ataque inimigo.",
+      "categoria": "ilusao",
+      "tipo_alvo": "point",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.0.veu_de_cor",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 0,
+      "nome": "Véu de Cor",
+      "descricao": "Camufla uma unidade brevemente sem impedir dano recebido.",
+      "categoria": "ilusao",
+      "tipo_alvo": "ally",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.1.clone_de_fumaca",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 1,
+      "nome": "Clone de Fumaça",
+      "descricao": "Invoca cópia falsa que desaparece após receber um golpe.",
+      "categoria": "ilusao",
+      "tipo_alvo": "point",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.1.passo_invisivel",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 1,
+      "nome": "Passo Invisível",
+      "descricao": "Torna uma unidade difícil de perceber até atacar.",
+      "categoria": "ilusao",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.2.exercito_eco",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 2,
+      "nome": "Exército-Eco",
+      "descricao": "Cria três soldados ilusórios sem dano real.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 2,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 6,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.2.desvio_de_perspectiva",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 2,
+      "nome": "Desvio de Perspectiva",
+      "descricao": "Reduz precisão dos ataques dirigidos contra um aliado.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "enemy",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.3.labirinto_de_miragens",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 3,
+      "nome": "Labirinto de Miragens",
+      "descricao": "Confunde a seleção de alvos de inimigos numa área pequena.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 2,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 8,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.3.silencio_do_espelho",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 3,
+      "nome": "Silêncio do Espelho",
+      "descricao": "Oculta sinais visuais e sonoros de movimento por instantes.",
+      "categoria": "ilusao",
+      "tipo_alvo": "ally",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.4.falsos_reforcos",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 4,
+      "nome": "Falsos Reforços",
+      "descricao": "Projeta um grupo de soldados falsos que provoca recuo tático.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 10,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.4.duplicata_avancada",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 4,
+      "nome": "Duplicata Avançada",
+      "descricao": "Cria cópia móvel que simula ataques sem causar dano.",
+      "categoria": "ilusao",
+      "tipo_alvo": "point",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.5.eclipse_dos_olhos",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 5,
+      "nome": "Eclipse dos Olhos",
+      "descricao": "Reduz severamente visão e precisão dos inimigos na zona.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.5.troca_de_imagens",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 5,
+      "nome": "Troca de Imagens",
+      "descricao": "Troca a posição de uma unidade com uma imagem próxima.",
+      "categoria": "teleporte",
+      "tipo_alvo": "ally",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.6.salao_de_espelhos",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 6,
+      "nome": "Salão de Espelhos",
+      "descricao": "Cria até oito cópias móveis distribuídas ao redor.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.6.ocultar_batalhao",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 6,
+      "nome": "Ocultar Batalhão",
+      "descricao": "Camufla até oito aliados até o primeiro ataque.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.illusion.7.cidade_fantasma",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 7,
+      "nome": "Cidade Fantasma",
+      "descricao": "Projeta estruturas ilusórias temporárias que confundem invasores.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.7.duplo_arcanista",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 7,
+      "nome": "Duplo Arcanista",
+      "descricao": "Cria cópia que simula uma conjuração sem causar dano real.",
+      "categoria": "ilusao",
+      "tipo_alvo": "point",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 0,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.8.mascara_da_realidade",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 8,
+      "nome": "Máscara da Realidade",
+      "descricao": "Mostra perigos fictícios e desorienta unidades comuns.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.8.desaparecimento_coletivo",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 8,
+      "nome": "Desaparecimento Coletivo",
+      "descricao": "Oculta até quinze aliados por curta duração.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.9.teatro_dos_mil_veus",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 9,
+      "nome": "Teatro dos Mil Véus",
+      "descricao": "Cria até trinta combatentes falsos para distrair um exército.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.illusion.9.veu_do_mundo",
+      "escola": "Ilusão",
+      "escola_id": "illusion",
+      "circulo": 9,
+      "nome": "Véu do Mundo",
+      "descricao": "Camufla até vinte aliados e cria alvos falsos próximos.",
+      "categoria": "ilusao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "criar alvos falsos sem dano direto",
+      "vfx": {
+        "forma": "circulo_illusion",
+        "cor_hex": "#A596FF",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Ilusão"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.0.toque_frio",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 0,
+      "nome": "Toque Frio",
+      "descricao": "Causa pequeno dano sombrio com lentidão momentânea.",
+      "categoria": "dano",
+      "tipo_alvo": "enemy",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 4,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "atingir e aplicar dano",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.0.eco_sepulcral",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 0,
+      "nome": "Eco Sepulcral",
+      "descricao": "Marca cadáveres recentes e revela unidades feridas nas proximidades.",
+      "categoria": "deteccao",
+      "tipo_alvo": "area",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 1,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 2,
+      "efeito_runtime_planejado": "marcar informacao temporaria sem alterar IA permanentemente",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.1.dreno_de_vigor",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 1,
+      "nome": "Dreno de Vigor",
+      "descricao": "Rouba pouca vida de um inimigo e cura parcialmente o conjurador.",
+      "categoria": "dreno_vital",
+      "tipo_alvo": "enemy",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 11,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "causar dano e curar com limite",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.1.servo_osseo",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 1,
+      "nome": "Servo Ósseo",
+      "descricao": "Ergue um esqueleto fraco a partir de um cadáver recente.",
+      "categoria": "invocacao",
+      "tipo_alvo": "corpse",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.2.nevoa_funeraria",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 2,
+      "nome": "Névoa Funerária",
+      "descricao": "Cria nuvem que causa dano sombrio por segundo.",
+      "categoria": "dano_periodico",
+      "tipo_alvo": "area",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 2,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 22,
+      "limite_alvos": 6,
+      "efeito_runtime_planejado": "criar zona temporaria que causa dano ao longo do tempo",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.2.mao_do_tumulo",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 2,
+      "nome": "Mão do Túmulo",
+      "descricao": "Enraíza um alvo comum por alguns segundos.",
+      "categoria": "controle",
+      "tipo_alvo": "enemy",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.3.vinculo_sanguineo",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 3,
+      "nome": "Vínculo Sanguíneo",
+      "descricao": "Redireciona fração limitada do dano recebido para inimigo vinculado.",
+      "categoria": "dreno_vital",
+      "tipo_alvo": "enemy",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 37,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "causar dano e curar com limite",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.3.esquadrao_reanimado",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 3,
+      "nome": "Esquadrão Reanimado",
+      "descricao": "Reanima até três cadáveres em soldados fracos.",
+      "categoria": "invocacao",
+      "tipo_alvo": "corpse",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.4.praga_cinzenta",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 4,
+      "nome": "Praga Cinzenta",
+      "descricao": "Infecção sombria se espalha para até dois inimigos próximos.",
+      "categoria": "dano_periodico",
+      "tipo_alvo": "enemy",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 3,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 56,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar zona temporaria que causa dano ao longo do tempo",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.4.sombra_faminta",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 4,
+      "nome": "Sombra Faminta",
+      "descricao": "Invoca sombra que drena pequena quantidade de vida em combate.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.5.coleta_de_almas",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 5,
+      "nome": "Coleta de Almas",
+      "descricao": "Recupera mana limitada quando criaturas marcadas morrem.",
+      "categoria": "melhoria",
+      "tipo_alvo": "self",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.5.marcha_cadaverica",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 5,
+      "nome": "Marcha Cadavérica",
+      "descricao": "Reanima até cinco cadáveres por duração curta.",
+      "categoria": "invocacao",
+      "tipo_alvo": "corpse",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.6.exercito_da_ultima_noite",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 6,
+      "nome": "Exército da Última Noite",
+      "descricao": "Ergue até oito mortos-vivos temporários de uma zona de batalha.",
+      "categoria": "invocacao",
+      "tipo_alvo": "corpse",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 0,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.6.selo_de_decomposicao",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 6,
+      "nome": "Selo de Decomposição",
+      "descricao": "Reduz armadura e resistência dos inimigos na área.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.necromancy.7.senhor_das_ossadas",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 7,
+      "nome": "Senhor das Ossadas",
+      "descricao": "Invoca um comandante morto-vivo único e resistente.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 0,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.7.mortandade_circular",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 7,
+      "nome": "Mortandade Circular",
+      "descricao": "Provoca forte dano sombrio em área com limite de alvos.",
+      "categoria": "dano_em_area",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 137,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "atingir os inimigos na area com limite de alvos",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.8.eclipse_vital",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 8,
+      "nome": "Eclipse Vital",
+      "descricao": "Drena vida de inimigos numa área e cura parcialmente o conjurador.",
+      "categoria": "dreno_vital",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 172,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "causar dano e curar com limite",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.8.arauto_funebre",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 8,
+      "nome": "Arauto Fúnebre",
+      "descricao": "Invoca um campeão espectral com aura de medo limitada.",
+      "categoria": "invocacao",
+      "tipo_alvo": "point",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 0,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.9.trono_da_morte",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 9,
+      "nome": "Trono da Morte",
+      "descricao": "Reanima até dez cadáveres e concede aura de fortalecimento limitada.",
+      "categoria": "invocacao",
+      "tipo_alvo": "corpse",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 0,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "criar criatura temporaria com limite de unidades ativas",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.necromancy.9.grande_quietude",
+      "escola": "Necromancia",
+      "escola_id": "necromancy",
+      "circulo": 9,
+      "nome": "Grande Quietude",
+      "descricao": "Cria zona que silencia conjurações e drena vida, sem morte instantânea.",
+      "categoria": "dano_periodico",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 211,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "criar zona temporaria que causa dano ao longo do tempo",
+      "vfx": {
+        "forma": "circulo_necromancy",
+        "cor_hex": "#AC78E8",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Necromancia"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.0.pele_de_argila",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 0,
+      "nome": "Pele de Argila",
+      "descricao": "Endurece temporariamente a pele, aumentando levemente armadura.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.0.dedos_habeis",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 0,
+      "nome": "Dedos Hábeis",
+      "descricao": "Aumenta velocidade de ataque de uma unidade por pouco tempo.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 3,
+      "recarga_seg": 2,
+      "conjuracao_seg": 0.25,
+      "alcance_blocos": 4,
+      "raio_blocos": 0,
+      "duracao_seg": 4,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 0,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.1.endurecer_aco",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 1,
+      "nome": "Endurecer Aço",
+      "descricao": "Fortalece dano físico de uma arma equipada.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.1.pes_de_vento",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 1,
+      "nome": "Pés de Vento",
+      "descricao": "Aumenta velocidade de deslocamento por pouco tempo.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 10,
+      "recarga_seg": 4,
+      "conjuracao_seg": 0.45,
+      "alcance_blocos": 6,
+      "raio_blocos": 0,
+      "duracao_seg": 6,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 1,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.2.garra_de_ferro",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 2,
+      "nome": "Garra de Ferro",
+      "descricao": "Transforma temporariamente os braços em armas naturais.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "ally",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 0,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.2.lama_ondulante",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 2,
+      "nome": "Lama Ondulante",
+      "descricao": "Cria terreno viscoso temporário que atrasa avanço.",
+      "categoria": "barreira",
+      "tipo_alvo": "area",
+      "mana": 18,
+      "recarga_seg": 7,
+      "conjuracao_seg": 0.6,
+      "alcance_blocos": 8,
+      "raio_blocos": 2,
+      "duracao_seg": 8,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 6,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "baixa"
+      },
+      "requisitos": {
+        "circulo_minimo": 2,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.3.corpo_de_basalto",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 3,
+      "nome": "Corpo de Basalto",
+      "descricao": "Concede armadura considerável e reduz velocidade de movimento.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "ally",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 10,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.3.passo_alado",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 3,
+      "nome": "Passo Alado",
+      "descricao": "Realiza um salto curto sobre obstáculo para local seguro.",
+      "categoria": "teleporte",
+      "tipo_alvo": "ally",
+      "mana": 30,
+      "recarga_seg": 11,
+      "conjuracao_seg": 0.8,
+      "alcance_blocos": 10,
+      "raio_blocos": 0,
+      "duracao_seg": 0,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "mover unidade para tile livre validado",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 3,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.4.espada_mercurial",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 4,
+      "nome": "Espada Mercurial",
+      "descricao": "Aumenta alcance e fluidez dos próximos golpes de espada.",
+      "categoria": "melhoria",
+      "tipo_alvo": "ally",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar bonus temporario com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.4.forma_bestial",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 4,
+      "nome": "Forma Bestial",
+      "descricao": "Concede garras, velocidade e força, com perda temporária de conjuração.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "ally",
+      "mana": 45,
+      "recarga_seg": 17,
+      "conjuracao_seg": 1.0,
+      "alcance_blocos": 12,
+      "raio_blocos": 0,
+      "duracao_seg": 12,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 4,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.5.armadura_viva",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 5,
+      "nome": "Armadura Viva",
+      "descricao": "Armadura encantada devolve pequena parte do dano físico.",
+      "categoria": "reflexao",
+      "tipo_alvo": "ally",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 0,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "refletir ataque com limite de dano refletido",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.5.campo_de_densidade",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 5,
+      "nome": "Campo de Densidade",
+      "descricao": "Aumenta a gravidade sentida por inimigos, reduzindo velocidade.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 65,
+      "recarga_seg": 25,
+      "conjuracao_seg": 1.25,
+      "alcance_blocos": 14,
+      "raio_blocos": 3,
+      "duracao_seg": 14,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 12,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "media"
+      },
+      "requisitos": {
+        "circulo_minimo": 5,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.6.pele_adamantina",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 6,
+      "nome": "Pele Adamantina",
+      "descricao": "Concede alta armadura com limite de redução de dano.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "ally",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 0,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.6.mare_de_pedra",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 6,
+      "nome": "Maré de Pedra",
+      "descricao": "Ergue obstáculos temporários sem alterar permanentemente os tiles.",
+      "categoria": "barreira",
+      "tipo_alvo": "area",
+      "mana": 90,
+      "recarga_seg": 36,
+      "conjuracao_seg": 1.5,
+      "alcance_blocos": 16,
+      "raio_blocos": 4,
+      "duracao_seg": 16,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 14,
+      "efeito_runtime_planejado": "criar zona de protecao temporaria",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 6,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3"
+    },
+    {
+      "id": "ama.spell.transmutation.7.gigante_de_guerra",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 7,
+      "nome": "Gigante de Guerra",
+      "descricao": "Aumenta tamanho, vida e força de um aliado por tempo curto.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "ally",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 0,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.7.enxame_liquido",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 7,
+      "nome": "Enxame Líquido",
+      "descricao": "Transforma material próximo em ondas lentas que imobilizam inimigos.",
+      "categoria": "controle",
+      "tipo_alvo": "area",
+      "mana": 120,
+      "recarga_seg": 50,
+      "conjuracao_seg": 1.8,
+      "alcance_blocos": 18,
+      "raio_blocos": 4,
+      "duracao_seg": 18,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 16,
+      "efeito_runtime_planejado": "aplicar efeito de controle com resistencia e imunidades",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "alta"
+      },
+      "requisitos": {
+        "circulo_minimo": 7,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.8.mestre_das_formas",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 8,
+      "nome": "Mestre das Formas",
+      "descricao": "Transmuta até cinco aliados para papéis marciais especializados.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.8.reescrita_da_materia",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 8,
+      "nome": "Reescrita da Matéria",
+      "descricao": "Fragiliza fortificações e armaduras numa região, sem editar mapa permanente.",
+      "categoria": "enfraquecimento",
+      "tipo_alvo": "area",
+      "mana": 160,
+      "recarga_seg": 75,
+      "conjuracao_seg": 2.1,
+      "alcance_blocos": 20,
+      "raio_blocos": 5,
+      "duracao_seg": 20,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 18,
+      "efeito_runtime_planejado": "aplicar penalidade temporaria com limite de acumulacao",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 8,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.9.avatar_perfeito",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 9,
+      "nome": "Avatar Perfeito",
+      "descricao": "Concede forma guerreira lendária com bônus altos, mas limitados.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "self",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 0,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 1,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    },
+    {
+      "id": "ama.spell.transmutation.9.transmutacao_do_campo",
+      "escola": "Transmutação",
+      "escola_id": "transmutation",
+      "circulo": 9,
+      "nome": "Transmutação do Campo",
+      "descricao": "Fortalece até quinze aliados e atrasa inimigos numa zona ampla.",
+      "categoria": "transmutacao",
+      "tipo_alvo": "area",
+      "mana": 210,
+      "recarga_seg": 120,
+      "conjuracao_seg": 2.5,
+      "alcance_blocos": 22,
+      "raio_blocos": 5,
+      "duracao_seg": 22,
+      "potencia_base_sugerida": 0,
+      "limite_alvos": 20,
+      "efeito_runtime_planejado": "aplicar alteracao temporaria sem mudar save permanentemente",
+      "vfx": {
+        "forma": "circulo_transmutation",
+        "cor_hex": "#B6D58A",
+        "intensidade": "lendaria"
+      },
+      "requisitos": {
+        "circulo_minimo": 9,
+        "escola_requerida": "Transmutação"
+      },
+      "estado_implementacao": "planejada_nao_ativa_no_mod_0_3_3",
+      "restricoes_especiais": "Elite/chefes resistem a controle; efeitos de area e invocacoes possuem limite global de desempenho."
+    }
+  ]
+}

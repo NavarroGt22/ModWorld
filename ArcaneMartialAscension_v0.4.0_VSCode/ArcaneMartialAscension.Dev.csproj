@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Projeto de apoio ao VS Code. O NeoModLoader compila os arquivos Code/ ao iniciar o jogo.
+       Esta DLL de desenvolvimento NAO deve ser colocada na pasta Mods. -->
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutputType>Library</OutputType>
+    <AssemblyName>ArcaneMartialAscension.Dev</AssemblyName>
+    <RootNamespace>ArcaneMartialAscension</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+    <GameRoot Condition="'$(GameRoot)' == ''">$(WORLD_BOX_PATH)</GameRoot>
+    <GameRoot Condition="'$(GameRoot)' == ''">C:\Program Files (x86)\Steam\steamapps\common\worldbox</GameRoot>
+    <ManagedDir>$(GameRoot)\worldbox_Data\Managed</ManagedDir>
+    <NmlDir>$(GameRoot)\worldbox_Data\StreamingAssets\mods</NmlDir>
+    <GameAssembly>$(ManagedDir)\Assembly-CSharp.dll</GameAssembly>
+    <GameAssembly Condition="Exists('$(NmlDir)\NML\Assembly-CSharp-Publicized.dll')">$(NmlDir)\NML\Assembly-CSharp-Publicized.dll</GameAssembly>
+    <NmlAssembly>$(NmlDir)\NeoModLoader.dll</NmlAssembly>
+    <NmlAssembly Condition="Exists('$(NmlDir)\NeoModLoader_memload.dll')">$(NmlDir)\NeoModLoader_memload.dll</NmlAssembly>
+  </PropertyGroup>
+  <!-- As referencias .NET Framework sao obtidas pelo NuGet. Nao sao redistribuidas as DLLs do jogo. -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="all" />
+    <Compile Include="ArcaneMartialAscension\Code\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="NeoModLoader">
+      <HintPath>$(NmlAssembly)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(GameAssembly)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine" Condition="Exists('$(ManagedDir)\UnityEngine.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule" Condition="Exists('$(ManagedDir)\UnityEngine.CoreModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.CoreModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule" Condition="Exists('$(ManagedDir)\UnityEngine.IMGUIModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.IMGUIModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule" Condition="Exists('$(ManagedDir)\UnityEngine.InputLegacyModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.InputLegacyModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule" Condition="Exists('$(ManagedDir)\UnityEngine.ImageConversionModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.ImageConversionModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule" Condition="Exists('$(ManagedDir)\UnityEngine.TextRenderingModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.TextRenderingModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule" Condition="Exists('$(ManagedDir)\UnityEngine.UIModule.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.UIModule.dll</HintPath><Private>false</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI" Condition="Exists('$(ManagedDir)\UnityEngine.UI.dll')">
+      <HintPath>$(ManagedDir)\UnityEngine.UI.dll</HintPath><Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckLocalGameAssemblies" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(NmlAssembly)')"
+           Text="NeoModLoader.dll ausente em $(NmlAssembly). Ajuste WORLD_BOX_PATH ou use scripts/build.ps1 -GamePath 'C:\caminho\worldbox'." />
+    <Error Condition="!Exists('$(GameAssembly)')"
+           Text="Assembly-CSharp.dll ausente em $(GameAssembly). Verifique a instalacao do WorldBox." />
+  </Target>
+</Project>

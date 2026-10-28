@@ -1,0 +1,6 @@
+{
+  "mana": {"initial": 100, "regenPerSecond": 2},
+  "aura": {"initialOnAwakening": 50, "regenPerSecond": 1},
+  "weaponXp": {"sword": 0, "spear": 0, "bow": 0, "axe": 0},
+  "notes": "Design values for later integration; current C# prototype uses constants."
+}
