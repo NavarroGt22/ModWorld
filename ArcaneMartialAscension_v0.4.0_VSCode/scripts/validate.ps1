@@ -11,8 +11,29 @@ foreach ($p in $paths) {
 }
 $manifest = Get-Content (Join-Path $mod 'mod.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $catalog = Get-Content (Join-Path $mod 'Config\catalogo_magias_160.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$null=Get-Content (Join-Path $mod 'Locales\br.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$null=Get-Content (Join-Path $mod 'Locales\en.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$br=Get-Content (Join-Path $mod 'Locales\br.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$en=Get-Content (Join-Path $mod 'Locales\en.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$traitIds=@('wizard','warlock','sorcerer','aura_awakened',
+ 'spell_shield','spell_boost','spell_focus','spell_illusion','spell_weaken')
+foreach($patron in @('fiend','archfey','celestial','great_old_one')){$traitIds+='patron_'+$patron}
+foreach($origin in @('draconic','wild','aberrant','clockwork','elemental','fey')){$traitIds+='origin_'+$origin}
+foreach($weapon in @('sword','spear','bow','axe')) {
+    $traitIds+=$weapon+'_master'
+    foreach($rank in 1..7){$traitIds+='mastery_'+$weapon+'_'+$rank}
+}
+foreach($school in @('abjuration','conjuration','divination','enchantment','evocation','illusion','necromancy','transmutation')) {
+    $traitIds+='school_'+$school
+}
+foreach($locale in @($br,$en)) {
+    foreach($id in $traitIds) {
+        foreach($suffix in @('','_info')) {
+            $key='trait_ama_'+$id+$suffix
+            if([string]::IsNullOrWhiteSpace($locale.$key)){throw "Traducao de traco ausente: $key"}
+        }
+    }
+    if([string]::IsNullOrWhiteSpace($locale.trait_group_ama_mastery_ranks)){throw 'Traducao do grupo de graus ausente'}
+    if([string]::IsNullOrWhiteSpace($locale.trait_group_ama_arcane_identities)){throw 'Traducao do grupo de pactos/linhagens ausente'}
+}
 if ($manifest.version -ne '0.4.0') { throw 'Esperado mod.json version 0.4.0' }
 if (@($catalog.magias).Count -ne 160) { throw "Esperadas 160 magias em JSON" }
 $groups = @($catalog.magias | Group-Object escola_id)
@@ -35,4 +56,5 @@ if ($missing.Count -gt 0) { throw "Magias no JSON mas ausentes no C#: $($missing
 $icons = Get-ChildItem (Join-Path $mod 'GameResources\ui\icons\ama') -Filter '*.png' -File
 if ($icons.Count -lt 16) { throw 'Icones de escolas/armas faltando' }
 Write-Host "OK: manifesto v$($manifest.version), 8 escolas, 160 magias sincronizadas com C#, $($icons.Count) icones."
+Write-Host "OK: $($traitIds.Count) tracos com nome e descricao em portugues e ingles, incluindo 7 graus por arma."
 Write-Host 'ATENCAO: validacao estatica. NAO compila C# nem executa o WorldBox.'

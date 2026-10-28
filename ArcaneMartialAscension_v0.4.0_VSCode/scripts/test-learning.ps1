@@ -7,14 +7,16 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 }
 # Reuse the installed NML compiler and the same real reference set as the mod build.
 . (Join-Path $PSScriptRoot 'build-nml.ps1') -GamePath $GamePath
-$testPath=Join-Path $projectRoot 'tests\LearningRulesTests.cs'
-$testTree=[Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree]::ParseText(
-    [IO.File]::ReadAllText($testPath),$options,$testPath,[Text.Encoding]::UTF8,[Threading.CancellationToken]::None)
+$testTrees=New-Object 'System.Collections.Generic.List[Microsoft.CodeAnalysis.SyntaxTree]'
+foreach($testSource in Get-ChildItem -LiteralPath (Join-Path $projectRoot 'tests') -Filter '*.cs' -File) {
+    $testTrees.Add([Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree]::ParseText(
+        [IO.File]::ReadAllText($testSource.FullName),$options,$testSource.FullName,[Text.Encoding]::UTF8,[Threading.CancellationToken]::None))
+}
 $references.Add([Microsoft.CodeAnalysis.MetadataReference]::CreateFromFile(
     $outputFile,[Microsoft.CodeAnalysis.MetadataReferenceProperties]::Assembly,$null))
 $testOptions=$compilationOptions.WithOutputKind([Microsoft.CodeAnalysis.OutputKind]::ConsoleApplication)
 $testCompilation=[Microsoft.CodeAnalysis.CSharp.CSharpCompilation]::Create(
-    'AMA.LearningTests',[Microsoft.CodeAnalysis.SyntaxTree[]]@($testTree),$references,$testOptions)
+    'AMA.LearningTests',$testTrees,$references,$testOptions)
 $testExe=Join-Path $outputFolder 'AMA.LearningTests.exe'
 $testStream=[IO.File]::Create($testExe)
 try { $testResult=$testCompilation.Emit($testStream,$null,$null,$null,$null,$null,[Threading.CancellationToken]::None) }

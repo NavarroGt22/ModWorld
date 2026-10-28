@@ -156,7 +156,64 @@ internal static class LearningRulesTests
             c.Available=true;Advance(p,c,51,66);Assert(!p.Arcane.Knows(Spark),"Banked combat time");
             Advance(p,c,67,67);Assert(p.Arcane.Knows(Spark),"Interrupted study could not resume");
         });
-        Console.WriteLine("Learning rules: "+passed+" passed, "+failed+" failed. No WorldBox runtime was executed.");
+        Check("untrained overview distinguishes no knowledge from circle zero",()=>{
+            var p=new CharacterProgression();var summary=new ArcaneOverview(p);
+            Assert(!summary.HasTraining && summary.KnownSpells==0 && summary.HighestLearnedCircle==-1,"Untrained actor shown as a learned caster");
+            Assert(summary.Schools.All(s=>s.KnownSpells==0 && s.HighestLearnedCircle==-1),"Empty school shown as circle 0");
+        });
+        Check("arcane overview keeps learned circles separate from capacity",()=>{
+            var p=new CharacterProgression();p.Arcane.Study(ArcaneTradition.Wizard,7500);
+            LearningRules.Learn(p,SpellCatalog.Find(Spark),KnowledgeSource.Player,1,1);
+            var summary=new ArcaneOverview(p);
+            Assert(p.Arcane.HighestCircle==9 && summary.HighestLearnedCircle==0,"Capacity mistaken for known magic");
+            Assert(summary.Schools[(int)MagicSchool.Evocation].HighestLearnedCircle==0,"Cantrip treated as unknown");
+        });
+        Check("multiple schools report independent learned counts and circles",()=>{
+            var p=new CharacterProgression();p.Arcane.Study(ArcaneTradition.Wizard,100);
+            LearningRules.Learn(p,SpellCatalog.Find(Spark),KnowledgeSource.Player,1,1);
+            LearningRules.Learn(p,SpellCatalog.Find("ama.spell.evocation.1.lanca_eletrica"),KnowledgeSource.Player,2,1);
+            LearningRules.Learn(p,SpellCatalog.Find("ama.spell.abjuration.0.centelha_guardia"),KnowledgeSource.Player,3,1);
+            var summary=new ArcaneOverview(p);
+            Assert(summary.KnownSpells==3 && summary.Schools[(int)MagicSchool.Evocation].KnownSpells==2,"Wrong learned count");
+            Assert(summary.Schools[(int)MagicSchool.Evocation].HighestLearnedCircle==1 && summary.Schools[(int)MagicSchool.Abjuration].HighestLearnedCircle==0,"School circles contaminated");
+            Assert(summary.Schools[(int)MagicSchool.Necromancy].HighestLearnedCircle==-1,"Unknown school unlocked");
+        });
+        Check("inspection snapshots do not modify character knowledge or XP",()=>{
+            var p=new CharacterProgression();Advance(p,Context(1,true),0,32);
+            int xp=p.Arcane.GetExperience(ArcaneTradition.Wizard),known=p.Arcane.KnownSpellIds.Count();
+            for(int i=0;i<20;i++)new ArcaneOverview(p);
+            Assert(p.Arcane.GetExperience(ArcaneTradition.Wizard)==xp && p.Arcane.KnownSpellIds.Count()==known && p.Mana==100,"Inspection changed progression");
+        });
+        Check("schools and traditions have distinct attribute profiles",()=>{
+            var schools=Enum.GetValues(typeof(MagicSchool)).Cast<MagicSchool>().Select(s=>TraitAttributeCatalog.School(s).Describe());
+            var traditions=Enum.GetValues(typeof(ArcaneTradition)).Cast<ArcaneTradition>().Select(t=>TraitAttributeCatalog.Tradition(t).Describe());
+            Assert(schools.Distinct().Count()==8 && traditions.Distinct().Count()==3,"Repeated identity profiles");
+        });
+        Check("all seven weapon ranks grow without multiplying past ranks",()=>{
+            foreach(Weapon weapon in Enum.GetValues(typeof(Weapon)))
+            {
+                TraitAttributes previous=TraitAttributeCatalog.Rank(weapon,0);
+                for(int level=1;level<=7;level++)
+                {
+                    var current=TraitAttributeCatalog.Rank(weapon,level);
+                    Assert(current.Health>=previous.Health && current.Damage>previous.Damage && current.Armor>=previous.Armor && current.AttackSpeed>=previous.AttackSpeed,"Rank regressed");
+                    previous=current;
+                }
+                Assert(TraitAttributeCatalog.Rank(weapon,-1).Describe()==TraitAttributeCatalog.Rank(weapon,0).Describe(),"Negative rank");
+                Assert(TraitAttributeCatalog.Rank(weapon,100).Describe()==previous.Describe(),"Rank overflow");
+            }
+        });
+        Check("weapons keep their own combat strengths at matching ranks",()=>{
+            var sword=TraitAttributeCatalog.Rank(Weapon.Sword,7);
+            var spear=TraitAttributeCatalog.Rank(Weapon.Spear,7);
+            var bow=TraitAttributeCatalog.Rank(Weapon.Bow,7);
+            var axe=TraitAttributeCatalog.Rank(Weapon.Axe,7);
+            Assert(axe.Damage>sword.Damage && axe.Health>0 && spear.Armor>sword.Armor && bow.AttackSpeed>sword.AttackSpeed,"Weapon identities collapsed");
+        });
+        Phase2RulesTests.Run(Check);
+        NaturalMagicTests.Run(Check);
+        IdentityPersistenceTests.Run(Check);
+        Console.WriteLine("AMA rules: "+passed+" passed, "+failed+" failed. No WorldBox runtime was executed.");
         return failed==0?0:1;
     }
 }

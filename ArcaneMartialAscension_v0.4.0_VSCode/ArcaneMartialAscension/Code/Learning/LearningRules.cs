@@ -1,11 +1,12 @@
 using System;
 using ArcaneMartialAscension.Core;
 using ArcaneMartialAscension.Spells;
+using ArcaneMartialAscension.Martial;
 using MartialWeaponType=ArcaneMartialAscension.Core.WeaponType;
 
 namespace ArcaneMartialAscension.Learning
 {
-    public enum KnowledgeSource { SelfStudy, Practice, Combat, Player }
+    public enum KnowledgeSource { SelfStudy, Practice, Combat, Player, Pact, Awakening }
 
     public sealed class KnowledgeOrigin
     {
@@ -23,6 +24,8 @@ namespace ArcaneMartialAscension.Learning
                     case KnowledgeSource.SelfStudy:return "estudo próprio";
                     case KnowledgeSource.Practice:return "prática com a arma";
                     case KnowledgeSource.Combat:return "combate";
+                    case KnowledgeSource.Pact:return "pacto arcano";
+                    case KnowledgeSource.Awakening:return "despertar e controle do poder inato";
                     default:return "intervenção do jogador";
                 }
             }
@@ -34,6 +37,7 @@ namespace ArcaneMartialAscension.Learning
         internal bool Observed,WasAvailable,WasMagicEligible;
         internal double LastTime,StudyClock,SpellWork,PracticeClock;
         internal MartialWeaponType? LastWeapon;
+        internal ArcaneTradition LastTradition;
         internal long LastCombatAction=long.MinValue;
         public string StudyingSpellId {get;internal set;}
         public string LastAction {get;internal set;}="Ainda sem sessões de aprendizado.";
@@ -48,6 +52,7 @@ namespace ArcaneMartialAscension.Learning
         public long ActorId;
         public bool Eligible,Available,MagicEligible;
         public MartialWeaponType? Weapon;
+        public ArcaneTradition Tradition=ArcaneTradition.Wizard;
     }
 
     public sealed class LearningOutcome
@@ -71,14 +76,18 @@ namespace ArcaneMartialAscension.Learning
             "ama.spell.evocation.1.lanca_eletrica",
             "ama.spell.evocation.1.rajada_de_cinzas"
         };
+        private static readonly string[] PactCurriculum={
+            "ama.spell.conjuration.0.agulha_eterea", "ama.spell.necromancy.0.toque_frio",
+            "ama.spell.necromancy.1.dreno_de_vigor", "ama.spell.conjuration.1.lamina_invocada"
+        };
+        private static readonly string[] FeyCurriculum={
+            "ama.spell.conjuration.0.agulha_eterea", "ama.spell.transmutation.0.dedos_habeis",
+            "ama.spell.conjuration.1.lamina_invocada", "ama.spell.transmutation.1.endurecer_aco"
+        };
 
         public static bool HasArcaneAptitude(long actorId)
         {
-            if(actorId<=0)return false;
-            uint value=unchecked((uint)(actorId^(actorId>>32)));
-            value=unchecked((value^0xA3C59AC3u)*0x85EBCA6Bu);
-            value^=value>>13;
-            return value%100<ArcaneAptitudePercent;
+            return NaturalMagicRules.Vocation(actorId).HasValue;
         }
 
         public static string WeaponKnowledgeId(MartialWeaponType weapon)
@@ -94,11 +103,11 @@ namespace ArcaneMartialAscension.Learning
             }
         }
 
-        public static bool Learn(CharacterProgression progress,SpellEntry spell,KnowledgeSource source,double now,long actorId)
+        public static bool Learn(CharacterProgression progress,SpellEntry spell,KnowledgeSource source,double now,long actorId,ArcaneTradition tradition=ArcaneTradition.Wizard)
         {
             if(progress==null || spell==null || double.IsNaN(now) || double.IsInfinity(now))return false;
             SpellDefinition definition=new SpellDefinition(spell.Id,spell.School,spell.Circle,spell.Mana);
-            if(!progress.Arcane.Learn(definition,ArcaneTradition.Wizard))return false;
+            if(!progress.Arcane.Learn(definition,tradition))return false;
             progress.RecordOrigin(spell.Id,new KnowledgeOrigin(source,now,actorId));
             return true;
         }
@@ -110,17 +119,22 @@ namespace ArcaneMartialAscension.Learning
             progress.Learning.LastCombatAction=actionToken;
             progress.TrainWeapon(weapon,Math.Min(2,CharacterProgression.WeaponXpThresholds[7]-progress.GetWeaponExperience(weapon)));
             progress.RecordOrigin(WeaponKnowledgeId(weapon),new KnowledgeOrigin(KnowledgeSource.Combat,now,actorId));
+            TechniqueRules.LearnFromTraining(progress,weapon,KnowledgeSource.Combat,now,actorId);
             progress.Learning.LastAction="Praticou "+WeaponName(weapon)+" em combate.";
             return true;
         }
 
-        private static SpellEntry NextSpell(CharacterProgression progress,bool requireCircle)
+        private static SpellEntry NextSpell(CharacterProgression progress,ArcaneTradition tradition,bool requireCircle)
         {
-            foreach(string id in Curriculum)
+            ArcaneIdentity identity=ArcaneIdentities.For(progress.Arcane,tradition);
+            System.Collections.Generic.IEnumerable<string> curriculum=identity!=null?identity.Curriculum:
+                (System.Collections.Generic.IEnumerable<string>)(tradition==ArcaneTradition.Warlock?PactCurriculum:
+                tradition==ArcaneTradition.Sorcerer && progress.Arcane.Origin==SorcerousOrigin.Fey?FeyCurriculum:Curriculum);
+            foreach(string id in curriculum)
             {
                 SpellEntry spell=SpellCatalog.Find(id);
                 if(spell==null || spell.Circle>1 || !SpellCatalog.HasRuntime(spell) || progress.Arcane.Knows(id))continue;
-                if(!requireCircle || progress.Arcane.GetCircle(ArcaneTradition.Wizard)>=spell.Circle)return spell;
+                if(!requireCircle || progress.Arcane.GetCircle(tradition)>=spell.Circle)return spell;
             }
             return null;
         }
@@ -128,12 +142,16 @@ namespace ArcaneMartialAscension.Learning
         public static LearningOutcome Tick(CharacterProgression progress,LearningContext context)
         {
             LearningOutcome result=new LearningOutcome();
-            if(progress==null || context==null || double.IsNaN(context.WorldTime) || double.IsInfinity(context.WorldTime))return result;
+            if(progress==null || context==null || double.IsNaN(context.WorldTime) || double.IsInfinity(context.WorldTime) || (int)context.Tradition<0 || (int)context.Tradition>2)return result;
             LearningProgress learning=progress.Learning;
             bool available=context.Eligible && context.Available;
             double elapsed=learning.Observed?context.WorldTime-learning.LastTime:0;
             bool continuing=learning.Observed && learning.WasAvailable && available;
-            bool continuingMagic=continuing && learning.WasMagicEligible && context.MagicEligible;
+            bool pathReady=context.Tradition==ArcaneTradition.Wizard ||
+                (context.Tradition==ArcaneTradition.Warlock?progress.Arcane.PatronId!=null:progress.Arcane.Origin!=SorcerousOrigin.None);
+            bool continuingMagic=continuing && learning.WasMagicEligible && context.MagicEligible && pathReady && learning.LastTradition==context.Tradition;
+            if(learning.LastTradition!=context.Tradition){learning.StudyClock=learning.SpellWork=0;learning.StudyingSpellId=null;}
+            learning.LastTradition=context.Tradition;
             bool sameWeapon=learning.LastWeapon==context.Weapon;
             if(!sameWeapon)learning.PracticeClock=0;
             learning.Observed=true;learning.LastTime=context.WorldTime;
@@ -143,7 +161,8 @@ namespace ArcaneMartialAscension.Learning
             {learning.StudyClock=learning.PracticeClock=0;return result;}
             if(!continuing || elapsed<=0)return result;
             elapsed=Math.Min(elapsed,MaxObservedSeconds);
-            bool studying=continuingMagic && NextSpell(progress,false)!=null;
+            SpellEntry next=continuingMagic?NextSpell(progress,context.Tradition,false):null;
+            bool studying=next!=null;
             bool practicing=sameWeapon && context.Weapon.HasValue && progress.GetWeaponLevel(context.Weapon.Value)<7;
             // A character cannot spend the same interval twice on two activities.
             double workTime=studying && practicing?elapsed*.5:elapsed;
@@ -153,19 +172,19 @@ namespace ArcaneMartialAscension.Learning
                 if(learning.StudyClock>=StudySessionSeconds)
                 {
                     learning.StudyClock-=StudySessionSeconds;
-                    int room=Math.Max(0,ArcaneProgression.CircleXpThresholds[2]-1-progress.Arcane.GetExperience(ArcaneTradition.Wizard));
-                    progress.Arcane.Study(ArcaneTradition.Wizard,Math.Min(5,room));
-                    progress.StudyMagic(MagicSchool.Evocation,5);
-                    SpellEntry spell=NextSpell(progress,true);
+                    int room=Math.Max(0,ArcaneProgression.CircleXpThresholds[2]-1-progress.Arcane.GetExperience(context.Tradition));
+                    progress.Arcane.Study(context.Tradition,Math.Min(5,room));
+                    progress.StudyMagic(next.School,5);
+                    SpellEntry spell=NextSpell(progress,context.Tradition,true);
                     if(spell!=null)
                     {
                         if(learning.StudyingSpellId!=spell.Id){learning.StudyingSpellId=spell.Id;learning.SpellWork=0;}
                         learning.SpellWork+=StudySessionSeconds;
-                        learning.LastAction="Estudando "+spell.Name+" ("+(int)learning.SpellWork+" / "+(spell.Circle==0?32:64)+").";
-                        if(learning.SpellWork>=(spell.Circle==0?32:64) && Learn(progress,spell,KnowledgeSource.SelfStudy,context.WorldTime,context.ActorId))
+                        learning.LastAction=NaturalMagicRules.Name(context.Tradition)+": praticando "+spell.Name+" ("+(int)learning.SpellWork+" / "+(spell.Circle==0?32:64)+").";
+                        if(learning.SpellWork>=(spell.Circle==0?32:64) && Learn(progress,spell,NaturalMagicRules.Source(context.Tradition),context.WorldTime,context.ActorId,context.Tradition))
                         {
                             result.LearnedSpell=spell;
-                            learning.LastAction="Aprendeu "+spell.Name+" por estudo próprio.";
+                            learning.LastAction="Aprendeu "+spell.Name+" · "+NaturalMagicRules.Name(context.Tradition)+".";
                             learning.StudyingSpellId=null;learning.SpellWork=0;
                         }
                     }
@@ -182,6 +201,7 @@ namespace ArcaneMartialAscension.Learning
                     int xp=Math.Min(PracticeXpPerSession,CharacterProgression.WeaponXpThresholds[7]-progress.GetWeaponExperience(weapon));
                     progress.TrainWeapon(weapon,xp);
                     progress.RecordOrigin(WeaponKnowledgeId(weapon),new KnowledgeOrigin(KnowledgeSource.Practice,context.WorldTime,context.ActorId));
+                    TechniqueRules.LearnFromTraining(progress,weapon,KnowledgeSource.Practice,context.WorldTime,context.ActorId);
                     learning.LastAction="Treinou "+WeaponName(weapon)+" com a arma equipada.";
                     result.PracticedWeapon=weapon;result.PracticeXp=xp;
                 }

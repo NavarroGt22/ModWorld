@@ -20,24 +20,47 @@ autonomamente.
 
 ------------------------------------------------------------------------
 
-# Estado desta revisão — 27/10/2026
+# Estado desta revisão — 28/10/2026
 
-- **Marco principal: Fase 1 em validação.** O critério mínimo da Fase 0
+- **Fase 2 em implementação, a pedido do usuário.** Motor genérico, técnicas
+  básicas e observador de acertos adicionados; suíte ampliada para 74 testes de regras.
+  Ver `docs/FASE_2.md`. Os aceites de combate da Fase 1 permanecem abertos.
+  Nesta revisão, um teste manual de Centelha Rubra confirmou HP 73→66,
+  custo de 3 mana e registro de recarga. Na expansão posterior, os três caminhos
+  aprenderam e conjuraram automaticamente contra ursos; carga segue pendente.
+  O critério mínimo da Fase 0
   (compilar/carregar) foi observado. F5 mostrou o círculo GUI. Ainda falta
-  confirmar uma conjuração completa em combate após a última correção.
+  completar os aceites de armas, repertórios e carga.
 - **Fase 2 parcialmente em código:** maestrias 0–7, leitura nativa de armas,
   XP por treino/ataque e deduplicação de callbacks. As regras passaram em
   testes automatizados; os quatro tipos ainda precisam de teste no jogo.
-- **Interface:** abas Maestrias e Grimório adicionadas à ficha. Isso não
+- **Interface:** abas Maestrias e Grimório adicionadas à ficha. A revisão
+  de 28/10 reúne escola/círculo na formação arcana, distingue conhecimento
+  do filtro do catálogo e define atributos próprios para tradições,
+  escolas, disciplinas e sete graus de cada arma. Os testes de regras
+  foram ampliados para 31 cenários (ver `docs/ATRIBUTOS_E_FORMACAO.md`). Isso não
   conclui animações de combate ou os efeitos específicos das 160 magias.
 - **Fases 4 e 6 iniciadas como protótipo, a pedido do usuário:** estudo
   próprio de quatro magias iniciais de Evocação, prática da arma equipada,
   origem do conhecimento e processamento em lotes. 24 cenários de regras
-  passaram; não houve validação dessa IA dentro do WorldBox nesta revisão.
-- **Fase 5 pendente:** progressão e origens continuam em memória e não
-  são restauradas pelo save do jogo.
-- **Próximo aceite:** validar a magia em combate, observar aprendizado/XP
-  autônomos em mundo descartável e implementar persistência antes de
+  passaram na revisão de 27/10. Em 28/10 foi observado um caso de estudo
+  espontâneo de Centelha Rubra no WorldBox, sem validar o currículo completo
+  ou a prática de armas. A expansão de formação natural inclui três caminhos:
+  Mago por estudo, Bruxo por ritual de pacto e Feiticeiro por despertar de origem.
+  Formação, aprendizado e conjuração automática foram observados no jogo.
+  A suíte atual tem 74 cenários de regras. Ver `docs/FORMACAO_NATURAL_E_FX.md`.
+- **Fase 3 iniciada como demonstração:** corte direcional, rastro/impacto de
+  projétil e feixe elétrico; objetos de sprite reutilizados e relógio de simulação.
+  Animação corporal, combos, esquiva e medição de desempenho continuam pendentes.
+- **Fase 4 ampliada e Fase 5 em implementação:** quatro patronos e quatro
+  origens principais de referência D&D, com adaptação de atributos/mana/currículo
+  e compatibilidade com identidades anteriores. Persistência versionada no
+  Actor adicionada; 99 cenários de regras aprovados. O mundo foi salvo e
+  reaberto após encerrar o WorldBox: 28 Actors restaurados sem diferenças
+  nos campos comparados, com Corte preciso I conferido na ficha. Herança entre
+  gerações e instituições continuam pendentes. Ver `docs/PACTOS_LINHAGENS_E_PERSISTENCIA.md`.
+- **Próximo aceite:** validar as quatro armas e repertórios completos,
+  refinar a demonstração visual e ampliar o aceite de persistência antes de
   considerar a evolução autônoma estável.
 
 Evidências: `docs/VALIDACAO_FASE_0.md`, `docs/VALIDACAO_CONJURACAO.md`
@@ -195,6 +218,13 @@ e dano; mana e recarga corretas; sem exceções no log.
 ------------------------------------------------------------------------
 
 ## Fase 2 — Motor genérico de magias e maestria confiável
+
+**Primeira entrega em código — 28/10/2026:** pedido/resultado/ticket de magia,
+sessão de custo e recarga, efeitos nativos separados do VFX, 11 perfis ativos,
+XP por perda real de HP, captura da arma de flechas no lançamento, quatro
+técnicas básicas e níveis I–III separados do grau da arma. A ficha reúne a
+lista de técnicas com os status da classe. 58 testes de regras passaram.
+Aceite completo e persistência continuam pendentes; ver `docs/FASE_2.md`.
 
 **Versão proposta:** v0.4.2  
 **Objetivo:** substituir comportamentos especiais improvisados por
@@ -361,6 +391,15 @@ carregar e reiniciar.
 - [ ] Definir herança de linhagem e transmissão cultural sem copiar
   automaticamente todas as habilidades.
 
+**Base entregue em 28/10/2026:** esquema v1 no ActorData nativo, isolamento
+por ID/referência, validação atômica, aliases legados e cobertura em 25 cenários
+novos (99 no total). Salvar, encerrar o processo e reabrir o slot 4 restaurou
+os 28 Actors comparados sem diferenças em magias, XP de espada, mana, patrono
+e origem; a ficha manteve grau Aprendiz e Corte preciso I. O aceite nativo de
+recargas/buffs ativos e do valor imediato de aura permanece aberto. A Fase 5
+completa depende também de instituições, herança e demais tarefas acima.
+Evidências e limites: `docs/PACTOS_LINHAGENS_E_PERSISTENCIA.md`.
+
 **Entregáveis:** persistência versionada, migrações e testes de
 restauração.  
 **Aceite:** após salvar e reabrir, habilidades, origens e progressão
@@ -395,7 +434,35 @@ permanecem consistentes.
 - [ ] Permitir decisões emergentes sem desbloqueios arbitrários.
 - [ ] Adicionar intervalos e orçamento de processamento por NPC.
 
-### 6.3 Observabilidade
+### 6.3 Aptidões naturais de criaturas
+
+Requisito do usuário em 28/10/2026; ainda não implementado. O protótipo
+atual de estudo exige um habitante sapiente adulto e não concede poderes
+por espécie. A base de perfis pode ser preparada na Fase 2; sua integração
+com aprendizado e decisões de combate pertence a esta fase.
+
+- [ ] Definir perfis por espécie com escolas, círculo inicial, potencial de
+  evolução, repertório inato e aptidões marciais. Verificar os IDs reais da
+  versão do jogo antes de associar perfis; os exemplos abaixo não fixam valores.
+- [ ] Dragões: afinidade arcana e círculos elevados, com poderes adequados
+  à criatura e evolução individual. Não atribuir automaticamente a formação
+  de Mago estudioso a uma criatura com magia inata.
+- [ ] Demônios: repertório poderoso e aptidão com espadas; técnicas e bônus
+  de espada exigem uma espada realmente equipada. Não criar equipamento
+  apenas por aplicar o perfil.
+- [ ] Outros animais e monstros: usar perfis explícitos quando fizer sentido,
+  preservando a diferença entre animais comuns e criaturas mágicas.
+- [ ] Separar aptidão natural, conhecimento inato e conhecimento aprendido;
+  registrar a origem de cada poder e manter progresso por indivíduo.
+- [ ] Aplicar a formação inicial uma única vez e preservar o progresso entre
+  saves, sem repetir concessões ou transferir experiência entre criaturas.
+- [ ] Mostrar escola, círculo e técnicas na ficha; identificar habilidades
+  apenas catalogadas. Um círculo alto não torna executável uma magia sem
+  runtime, nem permite gasto de mana quando o efeito falha.
+- [ ] Validar em mundo descartável: dragão, demônio armado/desarmado e animal
+  comum; testar evolução, pausa, recarga, custo e carga de muitas criaturas.
+
+### 6.4 Observabilidade
 
 - [ ] Exibir motivo da última escolha da IA em modo diagnóstico.
 - [ ] Registrar decisões relevantes sem inundar o log.

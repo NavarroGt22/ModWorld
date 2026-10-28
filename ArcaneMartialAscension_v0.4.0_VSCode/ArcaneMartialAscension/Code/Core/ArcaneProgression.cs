@@ -5,7 +5,7 @@ namespace ArcaneMartialAscension.Core
 {
     // Traditions are not exclusive classes: a character can develop all three.
     public enum ArcaneTradition { Wizard, Warlock, Sorcerer }
-    public enum SorcerousOrigin { None, Draconic, Elemental, Fey, Wild }
+    public enum SorcerousOrigin { None, Draconic, Elemental, Fey, Wild, Aberrant, Clockwork }
 
     public sealed class SpellDefinition
     {
@@ -26,6 +26,7 @@ namespace ArcaneMartialAscension.Core
     {
         private readonly Dictionary<ArcaneTradition, int> experience = new Dictionary<ArcaneTradition, int>();
         private readonly HashSet<string> learnedSpells = new HashSet<string>(StringComparer.Ordinal);
+        private readonly Dictionary<string,ArcaneTradition> spellTraditions=new Dictionary<string,ArcaneTradition>(StringComparer.Ordinal);
         public IEnumerable<string> KnownSpellIds {get{return learnedSpells;}}
         public static readonly int[] CircleXpThresholds={0,100,250,500,900,1500,2400,3600,5200,7500};
         public SorcerousOrigin Origin { get; private set; } = SorcerousOrigin.None;
@@ -45,8 +46,8 @@ namespace ArcaneMartialAscension.Core
             if (xp <= 0) return;
             experience[tradition] = (int)Math.Min(1000000L, (long)GetExperience(tradition) + xp);
         }
-        public void SetOrigin(SorcerousOrigin origin) { Origin = origin; }
-        public void SetPatron(string patronId) { PatronId = string.IsNullOrWhiteSpace(patronId) ? null : patronId; }
+        public void SetOrigin(SorcerousOrigin origin) { Origin = Enum.IsDefined(typeof(SorcerousOrigin),origin)?origin:SorcerousOrigin.None; }
+        public void SetPatron(string patronId) { PatronId = string.IsNullOrWhiteSpace(patronId) ? null : ArcaneIdentities.NormalizePatron(patronId); }
         public bool CanLearn(SpellDefinition spell, ArcaneTradition tradition)
         {
             if (spell == null || GetCircle(tradition) < spell.Circle) return false;
@@ -56,12 +57,15 @@ namespace ArcaneMartialAscension.Core
         }
         public bool Learn(SpellDefinition spell, ArcaneTradition tradition)
         {
-            return CanLearn(spell, tradition) && learnedSpells.Add(spell.Id);
+            if(!CanLearn(spell,tradition) || !learnedSpells.Add(spell.Id))return false;
+            spellTraditions[spell.Id]=tradition;return true;
         }
+        public ArcaneTradition TraditionFor(string spellId)
+        {ArcaneTradition tradition;return spellId!=null && spellTraditions.TryGetValue(spellId,out tradition)?tradition:ArcaneTradition.Wizard;}
         public bool Knows(string spellId) => spellId != null && learnedSpells.Contains(spellId);
         public bool CanCast(SpellDefinition spell, float mana)
         {
-            return spell != null && Knows(spell.Id) && HighestCircle >= spell.Circle && mana >= spell.ManaCost;
+            return spell != null && Knows(spell.Id) && GetCircle(TraditionFor(spell.Id)) >= spell.Circle && mana >= spell.ManaCost;
         }
     }
 }

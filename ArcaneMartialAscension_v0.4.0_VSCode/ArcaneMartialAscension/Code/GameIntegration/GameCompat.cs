@@ -11,7 +11,6 @@ namespace ArcaneMartialAscension.GameIntegration
         private const BindingFlags AnyInstance = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance;
         private const BindingFlags AnyStatic = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
         private static bool warnedPosition;
-        private static bool warnedStats;
 
         private static object Read(object target, string name)
         {
@@ -75,13 +74,13 @@ namespace ArcaneMartialAscension.GameIntegration
         {
             position = Vector3.zero;
             if (actorOrTile == null) return false;
-            // Confirmed in 0.51.2: this is the position used by Actor.updatePos/rendering.
+            // Logical map coordinates remain valid at every zoom and for hidden actors.
+            // They share the coordinate space used by PlayerControl.getMousePos.
             BaseSimObject sim=actorOrTile as BaseSimObject;
             if(sim!=null)
             {
-                position=sim.cur_transform_position;
-                position.z=0f;
-                return !float.IsNaN(position.x) && !float.IsNaN(position.y);
+                position=new Vector3(sim.current_position.x,sim.current_position.y,0f);
+                return !float.IsNaN(position.x) && !float.IsNaN(position.y) && !float.IsInfinity(position.x) && !float.IsInfinity(position.y);
             }
             // Try direct coordinates / Unity-type Vector3 first.
             if (ToVector(actorOrTile, out position)) return true;
@@ -131,62 +130,32 @@ namespace ArcaneMartialAscension.GameIntegration
             return world;
         }
 
-        public static void SetBirthChanceIfAvailable(ActorTrait trait, float percent)
+        public static void ConfigureProgressionTrait(ActorTrait trait)
         {
-            // 0.51.2: ActorTrait.birth no longer exists as a compile-time member.
-            SetOptional(trait, "birth", percent);
-        }
-
-        private static void SetOptional(object target, string name, object value)
-        {
-            if (target == null) return;
-            try
-            {
-                FieldInfo f = target.GetType().GetField(name, AnyInstance);
-                if (f != null) { f.SetValue(target, Convert.ChangeType(value, f.FieldType)); return; }
-                PropertyInfo p = target.GetType().GetProperty(name, AnyInstance);
-                if (p != null && p.CanWrite) p.SetValue(target, Convert.ChangeType(value, p.PropertyType), null);
-            }
-            catch (Exception) { }
+            // Native fields verified in 0.51.2. Formation/equipment owns these traits;
+            // native random births cannot create a class without its actual progression.
+            trait.rate_birth=0;
+            trait.rate_acquire_grow_up=0;
+            trait.rate_inherit=0;
+            trait.spawn_random_trait_allowed=false;
         }
 
         public static bool AddStat(ActorTrait trait, string statName, float bonus)
         {
-            if (trait == null) return false;
-            object stats = Read(trait, "base_stats");
-            if (stats == null) return false;
+            if(trait==null || string.IsNullOrEmpty(statName) || float.IsNaN(bonus) || float.IsInfinity(bonus))return false;
             try
             {
-                Type t = stats.GetType();
-                foreach (PropertyInfo p in t.GetProperties(AnyInstance))
-                {
-                    ParameterInfo[] keys = p.GetIndexParameters();
-                    if (p.Name == "Item" && p.CanWrite && keys.Length == 1 && keys[0].ParameterType == typeof(string))
-                    {
-                        p.SetValue(stats, Convert.ChangeType(bonus, p.PropertyType), new object[] { statName });
-                        return true;
-                    }
-                }
-                // Accommodate different game stat containers (set/add/stat setter).
-                foreach (MethodInfo method in t.GetMethods(AnyInstance))
-                {
-                    if (method.Name != "set" && method.Name != "Set" &&
-                        method.Name != "setStat" && method.Name != "add" && method.Name != "Add") continue;
-                    ParameterInfo[] p = method.GetParameters();
-                    if (p.Length != 2 || p[0].ParameterType != typeof(string)) continue;
-                    object number = Convert.ChangeType(bonus, p[1].ParameterType);
-                    method.Invoke(stats, new object[] { statName, number });
-                    return true;
-                }
+                // 0.51.2: inherited BaseUnlockableAsset.base_stats starts null.
+                // Verified in the local assembly, including BaseStats' string indexer.
+                if(AssetManager.base_stats_library.get(statName)==null)
+                    throw new InvalidOperationException("Atributo nativo desconhecido: "+statName);
+                if(trait.base_stats==null)trait.base_stats=new BaseStats();
+                trait.base_stats[statName]=bonus;
+                return Mathf.Approximately(trait.base_stats[statName],bonus);
             }
             catch (Exception e)
             {
-                Debug.LogWarning("[AMA 0.3.3] Failed setting stat " + statName + ": " + e.Message);
-            }
-            if (!warnedStats)
-            {
-                warnedStats = true;
-                Debug.LogWarning("[AMA 0.3.3] Could not write base_stats on WorldBox 0.51.2. Trait still works as a label and combat event hook.");
+                Debug.LogError("[AMA Stats] Falha em "+trait.id+" / "+statName+": "+e);
             }
             return false;
         }

@@ -9,11 +9,14 @@ namespace ArcaneMartialAscension.GameIntegration
     {
         private const BindingFlags Flags = BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance;
         private static float nextTraitWarning;
+        [ThreadStatic] private static int generatedDamageDepth;
+        public static bool IsApplyingGeneratedDamage {get{return generatedDamageDepth>0;}}
         public static bool TryDamage(Actor target,float amount,Actor attacker=null)
         {
             if(target==null || !target.isAlive() || amount<=0 || float.IsNaN(amount) || float.IsInfinity(amount))return false;
             try
             {
+                generatedDamageDepth++;
                 int before=target.getHealth();
                 // Do not skip a spell just because a normal attack is shaking the victim.
                 // Native damage keeps armor, get-hit hooks, death handling and attacker credit.
@@ -25,6 +28,7 @@ namespace ArcaneMartialAscension.GameIntegration
                 Debug.LogError("[AMA Combat] Falha no dano nativo: "+error);
                 return false;
             }
+            finally {generatedDamageDepth--;}
         }
         public static bool TryHeal(Actor target,float amount)
         {

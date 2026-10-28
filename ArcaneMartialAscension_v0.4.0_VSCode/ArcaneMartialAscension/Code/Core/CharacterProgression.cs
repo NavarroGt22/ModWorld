@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ArcaneMartialAscension.Learning;
+using ArcaneMartialAscension.Martial;
 
 namespace ArcaneMartialAscension.Core
 {
@@ -14,7 +15,10 @@ namespace ArcaneMartialAscension.Core
 
         public ArcaneProgression Arcane { get; } = new ArcaneProgression();
         public LearningProgress Learning {get;}=new LearningProgress();
+        public ArcaneFormation Formation {get;}=new ArcaneFormation();
+        public TechniqueProgression Techniques {get;}=new TechniqueProgression();
         private readonly Dictionary<string,KnowledgeOrigin> origins=new Dictionary<string,KnowledgeOrigin>(StringComparer.Ordinal);
+        internal IEnumerable<System.Collections.Generic.KeyValuePair<string,KnowledgeOrigin>> RecordedOrigins {get{return origins;}}
         public KnowledgeOrigin GetOrigin(string id)
         {KnowledgeOrigin origin;return id!=null && origins.TryGetValue(id,out origin)?origin:null;}
         public void RecordOrigin(string id,KnowledgeOrigin origin)
@@ -46,18 +50,22 @@ namespace ArcaneMartialAscension.Core
         }
         public string GetWeaponRank(WeaponType weapon)
         {
-            string[] ranks = { "Iniciante", "Aprendiz", "Praticante", "Veterano", "Especialista", "Mestre", "Grao-mestre", "Lenda" };
-            return ranks[GetWeaponLevel(weapon)];
+            return WeaponRankName(GetWeaponLevel(weapon));
+        }
+        public static string WeaponRankName(int level)
+        {
+            string[] ranks={"Iniciante","Aprendiz","Praticante","Veterano","Especialista","Mestre","Grão-mestre","Lenda"};
+            return ranks[Math.Max(0,Math.Min(7,level))];
         }
         public void GrowMana(int circle)
         {
-            MaxMana = 100f + Math.Max(0, Math.Min(9, circle)) * 35f;
+            MaxMana = 100f + Math.Max(0, Math.Min(9, circle)) * 35f+ArcaneIdentities.ManaBonus(Arcane);
             if (Mana > MaxMana) Mana = MaxMana;
         }
         public void TrainWeapon(WeaponType weapon, int xp)
         {
             if (xp <= 0) return;
-            weaponExperience[weapon] = Math.Min(1000000, GetWeaponExperience(weapon) + xp);
+            weaponExperience[weapon] = (int)Math.Min(1000000L, (long)GetWeaponExperience(weapon) + xp);
         }
 
         public bool CastSpell(float manaCost)
@@ -93,6 +101,12 @@ namespace ArcaneMartialAscension.Core
             if (float.IsNaN(seconds) || float.IsInfinity(seconds) || seconds <= 0) return;
             Mana = Math.Min(MaxMana, Mana + seconds * 2f);
             if (HasAwakenedAura) Aura = Math.Min(MaxAura, Aura + seconds);
+        }
+        internal void RestoreResources(float mana,float aura,bool awakened)
+        {
+            GrowMana(Arcane.HighestCircle);
+            if(awakened)AwakenAura();
+            Mana=Math.Max(0,Math.Min(MaxMana,mana));Aura=Math.Max(0,Math.Min(MaxAura,aura));
         }
     }
 }

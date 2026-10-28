@@ -199,13 +199,8 @@ namespace ArcaneMartialAscension.Spells
         // Advanced spells still appear in the catalog but can't consume mana yet.
         public static bool HasRuntime(SpellEntry s)
         {
-            if (s == null || s.Circle > 1) return false;
-            if (s.Category == "dano" || s.Category == "dano_em_area" ||
-                s.Category == "dreno_vital" || s.Category == "escudo" ||
-                s.Category == "melhoria" || s.Category == "ilusao" ||
-                s.Category == "deteccao" || s.Category == "controle" ||
-                s.Category == "enfraquecimento") return true;
-            return false;
+            SpellRuntimeProfile profile=SpellRuntimeCatalog.Find(s);
+            return profile!=null && profile.Effect.IsSupported && profile.State!=SpellDevelopmentState.Catalogued;
         }
     }
 }

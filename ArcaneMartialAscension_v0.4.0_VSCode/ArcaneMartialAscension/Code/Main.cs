@@ -31,6 +31,8 @@ namespace ArcaneMartialAscension
             try
             {
                 ModTraits.Register();
+                WeaponHitObserver.Register();
+                ActorProgressionPersistence.Register();
                 traitsReady=true;
                 status="Magias integradas: "+SpellCatalog.All.Count+" | selecione F7";
                 LogInfo("AMA v0.4.0: " + SpellCatalog.All.Count + " embedded spells, four weapon mastery paths, registered traits");
@@ -74,22 +76,21 @@ namespace ArcaneMartialAscension
         private Actor NearestAtCursor(bool excludeSelected)
         {
             if(World.world==null)return null;
-            Camera camera=GameCompat.MapCamera;
-            if(camera==null)return null;
+            // Native cursor coordinates use logical map positions. Render transforms
+            // can be stale at map zoom or while an actor is inside a building.
+            Vector2 cursor=World.world.getMousePos();
+            if(float.IsNaN(cursor.x) || float.IsNaN(cursor.y) || float.IsInfinity(cursor.x) || float.IsInfinity(cursor.y))return null;
+            Actor native=World.world.getActorNearCursor();
+            if(native!=null && native.isAlive() && (!excludeSelected || native!=selected))return native;
             Actor best=null;
-            float closest=excludeSelected?110f*110f:140f*140f;
+            float closest=8f*8f;
             int count=0;
-            foreach(Actor a in World.world.units)
+            foreach(Actor actor in World.world.units)
             {
-                if(a==null || !a.isAlive() || (excludeSelected && a==selected))continue;
-                Vector3 p;
-                if(!GameCompat.GetPosition(a,out p))continue;
-                Vector3 scr=camera.WorldToScreenPoint(p);
-                if(scr.z<0)continue;
-                float distance=(new Vector2(scr.x,scr.y)-
-                    new Vector2(Input.mousePosition.x,Input.mousePosition.y)).sqrMagnitude;
-                if(distance<closest){best=a;closest=distance;}
-                if(++count>12000)break;
+                if(actor==null || !actor.isAlive() || (excludeSelected && actor==selected))continue;
+                float distance=(actor.current_position-cursor).sqrMagnitude;
+                if(distance<closest){best=actor;closest=distance;}
+                if(++count>=12000)break;
             }
             return best;
         }
@@ -136,7 +137,8 @@ namespace ArcaneMartialAscension
         {
             if(!Selected())return;
             SpellEntry spell=CurrentSpell();
-            Actor target=NearestAtCursor(true);
+            SpellRuntimeProfile profile=SpellRuntimeCatalog.Find(spell);
+            Actor target=NearestAtCursor(profile==null || profile.TargetRule==SpellTargetRule.Hostile);
             status=ActorAbilities.Cast(selected,target,spell,true);
             if(status.StartsWith("OK"))LogInfo("AMA cast: "+status);
         }
@@ -176,7 +178,7 @@ namespace ArcaneMartialAscension
             if(!panelVisible)return;
             int x=Screen.width-425;
             if(x<5)x=5;
-            GUI.Box(new Rect(x,30,414,490),"Arcane & Martial Ascension 0.4 ALPHA");
+            GUI.Box(new Rect(x,30,414,552),"Arcane & Martial Ascension 0.4 ALPHA");
             GUI.Label(new Rect(x+10,52,396,19),traitsReady?
                 "Catalogo 160 magias | 4 armas | Tracos OK" : "Tracos falharam: Player.log");
             GUI.Label(new Rect(x+10,74,393,34),status);
@@ -216,10 +218,14 @@ namespace ArcaneMartialAscension
                 GUI.Label(new Rect(x+10,423,393,24),
                     ActorAbilities.WeaponStatus(selected,(MartialWeaponType)weaponIndex));
                 GUI.Label(new Rect(x+10,452,393,46),ActorAbilities.LearningStatusForDisplay(selected));
+                GUI.Label(new Rect(x+10,500,393,42),ActorAbilities.DiagnosticForDisplay(selected));
+                GUI.Label(new Rect(x+10,546,393,29),ActorAbilities.TechniqueStatusForDisplay(selected));
             }
         }
         private void OnDestroy()
         {
+            WeaponHitObserver.Unregister();
+            ActorProgressionPersistence.Unregister();
             ActorAbilities.ResetRuntimeForWorld();
             ScreenEffects.Clear();
             Visuals=null;

@@ -1,5 +1,39 @@
 # Maestrias e Grimório na ficha do personagem
 
+## Continuação: status da classe e técnicas
+
+A entrega inicial da Fase 2 reorganiza a aba marcial em uma ficha de classe.
+Classe/arma, grau, próximo grau, XP e técnicas conhecidas ficam juntos. A
+lista usa ícone, nome e nível romano I–III; selecionar uma linha mostra a
+descrição, potência, recarga, acertos da técnica e origem. As técnicas futuras
+ficam em Próximos treinos e não entram no contador de técnicas conhecidas.
+Quatro técnicas básicas têm executor; os graus de arma não concedem os
+níveis da técnica automaticamente. Evidências atuais: `FASE_2.md`.
+
+As seções abaixo documentam a revisão anterior da interface.
+
+## Revisão de 28/10/2026
+
+Cabeçalhos com ícone e linhas alternadas usam as prints de Combat Gods
+fornecidas pelo usuário como referência de organização. A composição e
+o catálogo permanecem próprios do AMA; não foram importados assets do outro mod.
+
+- Maestrias mostra arma equipada, grau, próximo grau, XP e atributos
+  próprios da disciplina e do grau. O estado ativo é conferido pelo
+  equipamento e pelos traços atuais do ator.
+- Sete graus por arma substituem o agrupamento anterior em três faixas.
+  Só o maior grau correspondente ao nível atual é aplicado.
+- Formação arcana reúne tradição, círculo disponível, mana e total aprendido.
+  As oito escolas mostram seu maior círculo aprendido e quantidade de magias.
+  Uma escola com traço mas sem magias aparece como afinidade.
+- O catálogo e seu filtro por círculo aparecem abaixo da formação.
+  Filtrar círculo 9 não transforma o personagem em conjurador de círculo 9.
+- Bônus mostrados vêm do mesmo `TraitAttributeCatalog` usado no registro
+  de atributos nativos. A leitura do resumo não modifica a progressão.
+
+Evidências desta revisão: `ATRIBUTOS_E_FORMACAO.md`. A seção abaixo documenta
+a interface anterior e os cenários de validação originais.
+
 ## Comportamento
 
 Dois ícones entram na coluna lateral da `UnitWindow`:

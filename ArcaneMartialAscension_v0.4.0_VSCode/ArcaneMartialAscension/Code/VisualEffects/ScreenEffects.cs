@@ -13,17 +13,20 @@ namespace ArcaneMartialAscension.VisualEffects
         {
             public Vector2 MouseScreen; // GUI coordinate system (top-left)
             public Vector3 World;
+            public Vector3 From;
             public bool HasWorld;
             public int Kind;
             public Color Tint;
-            public float Started;
+            public double Started;
+            public float Rotation;
             public float Duration;
             public string Label;
         }
         private const int Limit = 32;
         private static readonly List<Effect> live = new List<Effect>();
         private static Texture2D circle, slash, aura, bolt;
-        private static float lastCombatFx;
+        private static double lastCombatFx;
+        private static double Clock {get{return World.world!=null?World.world.getCurWorldTime():Time.unscaledTime;}}
         public sealed class Flight
         {
             public Vector3 From,To;
@@ -40,6 +43,17 @@ namespace ArcaneMartialAscension.VisualEffects
             return flight;
         }
         public static void Finish(Flight flight){flights.Remove(flight);}
+        public static void Slash(Vector3 from,Vector3 target,Color color)
+        {
+            Vector3 delta=target-from;
+            Emit(from+delta.normalized*.45f,1,color,"CORTE",false);
+            live[live.Count-1].Rotation=-Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg-30;
+        }
+        public static void Lightning(Vector3 from,Vector3 target)
+        {
+            Ensure();if(live.Count>=Limit)live.RemoveAt(0);
+            live.Add(new Effect{World=target,From=from,HasWorld=true,Kind=4,Tint=new Color(.5f,.8f,1f),Started=Clock,Duration=.28f});
+        }
 
         private static Texture2D Make(int kind)
         {
@@ -79,8 +93,8 @@ namespace ArcaneMartialAscension.VisualEffects
         }
         public static void Emit(object source, int kind, Color tint, string label, bool combat)
         {
-            if(combat && Time.time-lastCombatFx<.14f) return;
-            if(combat) lastCombatFx=Time.time;
+            if(combat && Clock-lastCombatFx<.14) return;
+            if(combat) lastCombatFx=Clock;
             Ensure();
             if(live.Count>=Limit) live.RemoveAt(0);
             Vector3 pos;
@@ -88,7 +102,7 @@ namespace ArcaneMartialAscension.VisualEffects
             live.Add(new Effect {
                 MouseScreen=new Vector2(Input.mousePosition.x,Screen.height-Input.mousePosition.y),
                 World=pos, HasWorld=has, Kind=kind, Tint=tint,
-                Started=Time.time, Duration=kind==0?1.5f:kind==1?.65f:.95f,
+                Started=Clock, Duration=kind==0?1.5f:kind==1?.4f:kind==3?.32f:.95f,
                 Label=label
             });
         }
@@ -140,10 +154,12 @@ namespace ArcaneMartialAscension.VisualEffects
             for(int i=live.Count-1;i>=0;i--)
             {
                 Effect e=live[i];
-                float t=(Time.time-e.Started)/e.Duration;
+                float t=(float)((Clock-e.Started)/e.Duration);
+                if(t<0){live.RemoveAt(i);continue;}
                 if(t>=1f) {live.RemoveAt(i);continue;}
+                if(e.Kind==4){DrawLightning(e,t,camera);continue;}
                 Vector2 center=Location(e);
-                float sz=e.Kind==0?130f:e.Kind==1?108f:116f;
+                float sz=e.Kind==0?130f:e.Kind==1?108f:e.Kind==3?42f:116f;
                 sz*=.80f+.30f*t;
                 Color col=e.Tint;
                 col.a=(1f-t)*.97f;
@@ -151,7 +167,7 @@ namespace ArcaneMartialAscension.VisualEffects
                 Color old=GUI.color;
                 GUI.color=col;
                 Matrix4x4 previous=GUI.matrix;
-                GUIUtility.RotateAroundPivot((e.Kind==0?70f:180f)*t,center);
+                GUIUtility.RotateAroundPivot(e.Rotation+(e.Kind==0?70f:95f)*t,center);
                 GUI.DrawTexture(new Rect(center.x-sz/2,center.y-sz/2,sz,sz),tex);
                 GUI.matrix=previous;
                 GUI.color=old;
@@ -161,10 +177,37 @@ namespace ArcaneMartialAscension.VisualEffects
                 }
             }
         }
+        private static void DrawLightning(Effect effect,float fraction,Camera camera)
+        {
+            if(camera==null)return;
+            Vector3 from=camera.WorldToScreenPoint(effect.From),to=camera.WorldToScreenPoint(effect.World);
+            if(from.z<0 || to.z<0)return;
+            Vector2 a=new Vector2(from.x,Screen.height-from.y),b=new Vector2(to.x,Screen.height-to.y);
+            if((b-a).sqrMagnitude<1)return;
+            Vector2 normal=new Vector2(-(b-a).y,(b-a).x).normalized;
+            Vector2 previousPoint=a;
+            int phase=(int)(fraction*3);
+            Color old=GUI.color;
+            Matrix4x4 original=GUI.matrix;
+            for(int i=1;i<=8;i++)
+            {
+                Vector2 point=Vector2.Lerp(a,b,i/8f)+(i==8?Vector2.zero:normal*Mathf.Sin((i+phase)*2.17f)*6);
+                Vector2 delta=point-previousPoint;
+                GUIUtility.RotateAroundPivot(Mathf.Atan2(delta.y,delta.x)*Mathf.Rad2Deg,previousPoint);
+                Color color=effect.Tint;color.a=1-fraction;
+                GUI.color=color;
+                GUI.DrawTexture(new Rect(previousPoint.x,previousPoint.y-2,delta.magnitude,4),Texture2D.whiteTexture);
+                GUI.color=new Color(1,1,1,1-fraction);
+                GUI.DrawTexture(new Rect(previousPoint.x,previousPoint.y-.5f,delta.magnitude,1),Texture2D.whiteTexture);
+                GUI.matrix=original;previousPoint=point;
+            }
+            GUI.color=old;
+        }
         public static void Clear()
         {
             live.Clear();
             flights.Clear();
+            lastCombatFx=0;
             if(circle!=null) UnityEngine.Object.Destroy(circle);
             if(slash!=null) UnityEngine.Object.Destroy(slash);
             if(aura!=null) UnityEngine.Object.Destroy(aura);

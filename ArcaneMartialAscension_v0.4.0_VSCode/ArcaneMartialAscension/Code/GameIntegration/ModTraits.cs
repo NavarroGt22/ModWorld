@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using ArcaneMartialAscension.Core;
 
 namespace ArcaneMartialAscension.GameIntegration
 {
@@ -23,90 +24,91 @@ namespace ArcaneMartialAscension.GameIntegration
         private const string GroupArcane = "ama_arcane";
         private const string GroupMartial = "ama_martial";
         private const string GroupSchools = "ama_schools";
+        private const string GroupRanks = "ama_mastery_ranks";
+        private const string GroupIdentities="ama_arcane_identities";
+        private static int registeredCount;
 
         public static void Register()
         {
+            registeredCount=0;
             AddGroup(GroupArcane, new Color(0.40f, 0.65f, 1f));
             AddGroup(GroupMartial, new Color(1f, 0.72f, 0.35f));
             AddGroup(GroupSchools, new Color(0.72f, 0.49f, 1f));
+            AddGroup(GroupRanks, new Color(1f,0.55f,0.25f));
+            AddGroup(GroupIdentities,new Color(.75f,.55f,1f));
 
-            ActorTrait wizard = Create(Wizard, GroupArcane, "wizard", 4f);
-            GameCompat.AddStat(wizard, "damage", 3f);
+            ActorTrait wizard = Create(Wizard, GroupArcane, "wizard");
+            ApplyAttributes(wizard,TraitAttributeCatalog.Tradition(ArcaneTradition.Wizard));
             wizard.action_attack_target = new AttackAction(ActorAbilities.OnWizardAttack);
             RegisterTrait(wizard);
 
-            ActorTrait warlock = Create(Warlock, GroupArcane, "warlock", 2f);
-            GameCompat.AddStat(warlock, "damage", 4f);
+            ActorTrait warlock = Create(Warlock, GroupArcane, "warlock");
+            ApplyAttributes(warlock,TraitAttributeCatalog.Tradition(ArcaneTradition.Warlock));
             warlock.action_attack_target = new AttackAction(ActorAbilities.OnWarlockAttack);
             RegisterTrait(warlock);
 
-            ActorTrait sorcerer = Create(Sorcerer, GroupArcane, "sorcerer", 3f);
-            GameCompat.AddStat(sorcerer, "damage", 4f);
+            ActorTrait sorcerer = Create(Sorcerer, GroupArcane, "sorcerer");
+            ApplyAttributes(sorcerer,TraitAttributeCatalog.Tradition(ArcaneTradition.Sorcerer));
             sorcerer.action_attack_target = new AttackAction(ActorAbilities.OnSorcererAttack);
             RegisterTrait(sorcerer);
 
-            ActorTrait sword = Create(Sword, GroupMartial, "sword", 10f);
-            GameCompat.AddStat(sword, "damage", 5f);
-            GameCompat.AddStat(sword, "attack_speed", 8f);
+            ActorTrait sword = Create(Sword, GroupMartial, "sword");
+            ApplyAttributes(sword,TraitAttributeCatalog.Weapon(Core.WeaponType.Sword));
             sword.action_attack_target = new AttackAction(ActorAbilities.OnSwordAttack);
             RegisterTrait(sword);
 
-            ActorTrait spear = Create(Spear, GroupMartial, "spear", 6f);
-            GameCompat.AddStat(spear, "damage", 2f);
+            ActorTrait spear = Create(Spear, GroupMartial, "spear");
+            ApplyAttributes(spear,TraitAttributeCatalog.Weapon(Core.WeaponType.Spear));
             spear.action_attack_target = new AttackAction(ActorAbilities.OnSpearAttack);
             RegisterTrait(spear);
-            ActorTrait bow = Create(Bow, GroupMartial, "bow", 6f);
-            GameCompat.AddStat(bow, "attack_speed", 5f);
+            ActorTrait bow = Create(Bow, GroupMartial, "bow");
+            ApplyAttributes(bow,TraitAttributeCatalog.Weapon(Core.WeaponType.Bow));
             bow.action_attack_target = new AttackAction(ActorAbilities.OnBowAttack);
             RegisterTrait(bow);
-            ActorTrait axe = Create(Axe, GroupMartial, "axe", 6f);
-            GameCompat.AddStat(axe, "damage", 4f);
+            ActorTrait axe = Create(Axe, GroupMartial, "axe");
+            ApplyAttributes(axe,TraitAttributeCatalog.Weapon(Core.WeaponType.Axe));
             axe.action_attack_target = new AttackAction(ActorAbilities.OnAxeAttack);
             RegisterTrait(axe);
             // Rank traits are granted only after qualifying XP, and remain visible.
             for (int type = 0; type < 4; type++)
             {
-                string[] ids = { Sword, Spear, Bow, Axe };
                 string[] icons = { "sword", "spear", "bow", "axe" };
-                for (int rank = 1; rank <= 3; rank++)
+                for (int rank = 1; rank <= TraitAttributeCatalog.MaxWeaponLevel; rank++)
                 {
-                    ActorTrait levelTrait = Create(RankId((Core.WeaponType)type, rank), GroupMartial, icons[type], 0f);
-                    GameCompat.AddStat(levelTrait, "damage", rank * 2f);
-                    GameCompat.AddStat(levelTrait, "attack_speed", rank * 1.5f);
+                    ActorTrait levelTrait = Create(RankId((Core.WeaponType)type, rank), GroupRanks, icons[type]);
+                    ApplyAttributes(levelTrait,TraitAttributeCatalog.Rank((Core.WeaponType)type,rank));
                     RegisterTrait(levelTrait);
                 }
             }
-            ActorTrait protectedTrait = Create(SpellShield, GroupArcane, "abjuration", 0f);
-            GameCompat.AddStat(protectedTrait, "armor", 8f);
+            ActorTrait protectedTrait = Create(SpellShield, GroupArcane, "abjuration");
+            ApplyAttributes(protectedTrait,new TraitAttributes(armor:8));
             RegisterTrait(protectedTrait);
-            ActorTrait boostedTrait = Create(SpellBoost, GroupArcane, "transmutation", 0f);
-            GameCompat.AddStat(boostedTrait, "damage", 5f);
+            ActorTrait boostedTrait = Create(SpellBoost, GroupArcane, "transmutation");
+            ApplyAttributes(boostedTrait,new TraitAttributes(damage:5));
             RegisterTrait(boostedTrait);
 
-            ActorTrait focus=Create(SpellFocus,GroupArcane,"divination",0f);
-            GameCompat.AddStat(focus,"attack_speed",7f);
+            ActorTrait focus=Create(SpellFocus,GroupArcane,"divination");
+            ApplyAttributes(focus,new TraitAttributes(attackSpeed:7));
             RegisterTrait(focus);
-            ActorTrait mirage=Create(SpellIllusion,GroupArcane,"illusion",0f);
-            GameCompat.AddStat(mirage,"armor",6f);
+            ActorTrait mirage=Create(SpellIllusion,GroupArcane,"illusion");
+            ApplyAttributes(mirage,new TraitAttributes(armor:6));
             RegisterTrait(mirage);
-            ActorTrait weaken=Create(SpellWeaken,GroupArcane,"enchantment",0f);
-            GameCompat.AddStat(weaken,"damage",-5f);
+            ActorTrait weaken=Create(SpellWeaken,GroupArcane,"enchantment");
+            ApplyAttributes(weaken,new TraitAttributes(damage:-5));
             RegisterTrait(weaken);
 
-            ActorTrait aura = Create(Aura, GroupMartial, "aura", 3f);
-            GameCompat.AddStat(aura, "armor", 6f);
-            GameCompat.AddStat(aura, "health", 30f);
+            ActorTrait aura = Create(Aura, GroupMartial, "aura");
+            ApplyAttributes(aura,new TraitAttributes(health:30,armor:6));
             aura.action_special_effect = new WorldAction(ActorAbilities.OnAuraTick);
             RegisterTrait(aura);
 
-            AddSchool("ama_school_abjuration", "abjuration", 1.6f, 0, 3, 0);
-            AddSchool("ama_school_conjuration", "conjuration", 1.6f, 1, 0, 5);
-            AddSchool("ama_school_divination", "divination", 1.6f, 0, 0, 8);
-            AddSchool("ama_school_enchantment", "enchantment", 1.6f, 1, 0, 4);
-            AddSchool(Evocation, "evocation", 2.5f, 3, 0, 0);
-            AddSchool("ama_school_illusion", "illusion", 1.6f, 0, 1, 4);
-            AddSchool("ama_school_necromancy", "necromancy", 1.6f, 2, 0, 0);
-            AddSchool("ama_school_transmutation", "transmutation", 1.6f, 1, 2, 0);
+            for(int school=0;school<8;school++)AddSchool((MagicSchool)school);
+            foreach(ArcaneIdentity identity in ArcaneIdentities.All)
+            {
+                ActorTrait trait=Create(identity.TraitId,GroupIdentities,identity.Icon);
+                ApplyAttributes(trait,identity.Attributes);RegisterTrait(trait);
+            }
+            Debug.Log("[AMA Stats] "+registeredCount+" traços registrados com atributos nativos verificados.");
         }
 
         public static string RankId(Core.WeaponType weapon, int tier)
@@ -136,7 +138,7 @@ namespace ArcaneMartialAscension.GameIntegration
             });
         }
 
-        private static ActorTrait Create(string id, string group, string icon, float birthChance)
+        private static ActorTrait Create(string id, string group, string icon)
         {
             ActorTrait trait = new ActorTrait
             {
@@ -144,23 +146,35 @@ namespace ArcaneMartialAscension.GameIntegration
                 group_id = group,
                 path_icon = "ui/icons/ama/" + icon
             };
-            GameCompat.SetBirthChanceIfAvailable(trait, birthChance);
+            GameCompat.ConfigureProgressionTrait(trait);
             return trait;
         }
 
-        private static void AddSchool(string id, string icon, float birthChance, int damage, int armor, int attackSpeed)
+        private static void AddSchool(MagicSchool school)
         {
-            ActorTrait trait = Create(id, GroupSchools, icon, birthChance);
-            if (damage != 0) GameCompat.AddStat(trait, "damage", damage);
-            if (armor != 0) GameCompat.AddStat(trait, "armor", armor);
-            if (attackSpeed != 0) GameCompat.AddStat(trait, "attack_speed", attackSpeed);
+            ActorTrait trait=Create(SchoolTrait(school),GroupSchools,school.ToString().ToLowerInvariant());
+            ApplyAttributes(trait,TraitAttributeCatalog.School(school));
             RegisterTrait(trait);
+        }
+
+        private static void ApplyAttributes(ActorTrait trait,TraitAttributes attributes)
+        {
+            AddRequiredStat(trait,"health",attributes.Health);
+            AddRequiredStat(trait,"damage",attributes.Damage);
+            AddRequiredStat(trait,"armor",attributes.Armor);
+            AddRequiredStat(trait,"attack_speed",attributes.AttackSpeed);
+        }
+        private static void AddRequiredStat(ActorTrait trait,string stat,float value)
+        {
+            if(value!=0 && !GameCompat.AddStat(trait,stat,value))
+                throw new InvalidOperationException("Não foi possível registrar "+stat+" no traço "+trait.id);
         }
 
         private static void RegisterTrait(ActorTrait trait)
         {
             if (AssetManager.traits.get(trait.id) == null)
                 AssetManager.traits.add(trait);
+            registeredCount++;
             // Make it accessible in the trait editor as well as character details.
             // API versions differ: unlock via reflection so a removed optional
             // editor helper cannot prevent compilation/loading of every trait.

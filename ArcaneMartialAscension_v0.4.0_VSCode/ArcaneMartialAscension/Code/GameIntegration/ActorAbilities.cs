@@ -5,6 +5,8 @@ using ArcaneMartialAscension.Core;
 using ArcaneMartialAscension.Spells;
 using ArcaneMartialAscension.VisualEffects;
 using ArcaneMartialAscension.Learning;
+using ArcaneMartialAscension.Martial;
+using ArcaneMartialAscension.Persistence;
 using MartialWeaponType = ArcaneMartialAscension.Core.WeaponType;
 
 namespace ArcaneMartialAscension.GameIntegration
@@ -13,12 +15,20 @@ namespace ArcaneMartialAscension.GameIntegration
     {
         private sealed class ActorState
         {
-            public readonly CharacterProgression Progress = new CharacterProgression();
-            public readonly Dictionary<string,float> Cooldowns = new Dictionary<string,float>(StringComparer.Ordinal);
-            public readonly Dictionary<string,float> Temporary = new Dictionary<string,float>(StringComparer.Ordinal);
-            public float LastSword, LastMagic, LastAura, LastUpdate;
+            public readonly CharacterProgression Progress;
+            public readonly SpellCastingSession Casting;
+            public readonly long ActorId;
+            public readonly ActorData Data;
+            public bool PreserveSnapshot;
+            public ActorState(Actor actor,CharacterProgression progress=null)
+            {ActorId=actor.getID();Data=DataFor(actor);Progress=progress??new CharacterProgression();Casting=new SpellCastingSession(Progress);}
+            public readonly Dictionary<string,double> Temporary = new Dictionary<string,double>(StringComparer.Ordinal);
+            public float LastAura;
+            public double LastMagic;
+            public double LastUpdate;
+            public int LastWeaponHitFrame=-1;
             public float LastDiagnostic;
-            public string PreferredSpellId, LastCast;
+            public string PreferredSpellId, LastCast,LastTechnique;
             public PendingCast Pending;
             public bool Initialized;
         }
@@ -27,8 +37,10 @@ namespace ArcaneMartialAscension.GameIntegration
             public Actor Caster,Target;
             public ActorState State;
             public SpellEntry Spell;
+            public SpellCastTicket Ticket;
             public Vector3 From;
             public float Age,Duration;
+            public double LastWorldTime;
             public bool Manual,Log;
             public ScreenEffects.Flight Flight;
             public Transform Sprite;
@@ -43,22 +55,97 @@ namespace ArcaneMartialAscension.GameIntegration
         private static float lastCleanup;
         private static float lastWeaponScan;
         private static int weaponScanOffset;
+        private static double WorldTime {get{return World.world!=null?World.world.getCurWorldTime():0;}}
+        private static ActorData DataFor(Actor actor){return actor!=null?actor.getData() as ActorData:null;}
         private static ActorState State(Actor actor)
         {
             ActorState s;
-            if(!states.TryGetValue(actor,out s))
-            {s=new ActorState();states[actor]=s;}
+            if(!states.TryGetValue(actor,out s) || s.ActorId!=actor.getID() || !ReferenceEquals(s.Data,DataFor(actor)))
+            {s=RestoreActor(actor);states[actor]=s;}
             if(!s.Initialized)
             {
                 s.Initialized=true;
-                s.LastUpdate=Time.time;
+                s.LastUpdate=WorldTime;
                 // Powers now come from recorded study, practice or explicit player actions.
             }
-            float dt=Mathf.Clamp(Time.time-s.LastUpdate,0f,10f);
+            double now=WorldTime;
+            float dt=World.world!=null && !World.world.isPaused()?(float)Math.Max(0,Math.Min(10,now-s.LastUpdate)):0;
             s.Progress.GrowMana(s.Progress.Arcane.HighestCircle);
             s.Progress.Regenerate(dt);
-            s.LastUpdate=Time.time;
+            s.LastUpdate=now;
+            if(!s.PreserveSnapshot)SyncIdentityTraits(actor,s.Progress);
             return s;
+        }
+        private static ActorState RestoreActor(Actor actor)
+        {
+            string json=null;
+            ActorData data=DataFor(actor);
+            if(data!=null)data.get(ActorProgressionPersistence.Key,out json,null);
+            CharacterProgression progress;ProgressionSnapshot snapshot;string error;
+            SnapshotStatus status=ProgressionCodec.Load(json,actor.getID(),WorldTime,out progress,out snapshot,out error);
+            var state=new ActorState(actor,progress){PreserveSnapshot=status==SnapshotStatus.Invalid || status==SnapshotStatus.Unsupported};
+            if(status==SnapshotStatus.Restored)
+            {
+                state.PreferredSpellId=snapshot.PreferredSpell;
+                foreach(SavedSpell spell in snapshot.Spells)state.Casting.RestoreCooldown(SpellCatalog.Find(spell.Id),spell.Remaining,WorldTime);
+                foreach(SavedBuff buff in snapshot.Buffs)state.Temporary[buff.Id]=WorldTime+buff.Remaining;
+                Debug.Log("[AMA Save] restored actor="+actor.getID()+" spells="+snapshot.Spells.Count+" swordXp="+progress.GetWeaponExperience(MartialWeaponType.Sword)+
+                    " mana="+progress.Mana+" patron="+progress.Arcane.PatronId+" origin="+progress.Arcane.Origin);
+            }
+            else if(status!=SnapshotStatus.Missing)Debug.LogWarning("[AMA Save] actor="+actor.getID()+" status="+status+" · "+error+
+                (status==SnapshotStatus.ForeignActor?" · progresso de outro Actor ignorado.":" · dados originais preservados."));
+            return state;
+        }
+        public static void SaveForActor(Actor actor)
+        {
+            ActorState state;
+            ActorData data=DataFor(actor);
+            if(actor==null || !actor.isAlive() || data==null || !states.TryGetValue(actor,out state) || state.ActorId!=actor.getID() ||
+                !ReferenceEquals(state.Data,data) || state.PreserveSnapshot)return;
+            state=State(actor);
+            double now=WorldTime;
+            var expired=new List<string>();
+            foreach(var buff in state.Temporary)if(buff.Value<=now)
+            {if(!CombatBridge.RemoveTrait(actor,buff.Key))throw new InvalidOperationException("Bônus expirado não removido: "+buff.Key);expired.Add(buff.Key);}
+            foreach(string id in expired)state.Temporary.Remove(id);
+            ProgressionSnapshot snapshot=ProgressionCodec.Capture(state.Progress,actor.getID(),now);
+            snapshot.PreferredSpell=state.PreferredSpellId;
+            foreach(SavedSpell spell in snapshot.Spells)spell.Remaining=state.Casting.CooldownRemaining(SpellCatalog.Find(spell.Id),now);
+            foreach(var buff in state.Temporary)snapshot.Buffs.Add(new SavedBuff{Id=buff.Key,Remaining=buff.Value-now});
+            string json=ProgressionCodec.Encode(snapshot);
+            data.set(ActorProgressionPersistence.Key,json);
+            Debug.Log("[AMA Save] saved actor="+actor.getID()+" spells="+snapshot.Spells.Count+" swordXp="+state.Progress.GetWeaponExperience(MartialWeaponType.Sword)+
+                " mana="+state.Progress.Mana+" patron="+state.Progress.Arcane.PatronId+" origin="+state.Progress.Arcane.Origin+" bytes="+json.Length);
+        }
+        private static void SyncIdentityTraits(Actor actor,CharacterProgression progress)
+        {
+            ArcaneIdentity patron=ArcaneIdentities.Patron(progress.Arcane.PatronId),lineage=ArcaneIdentities.Lineage(progress.Arcane.Origin);
+            foreach(ArcaneIdentity identity in ArcaneIdentities.All)
+            {
+                if(identity==patron || identity==lineage)Ensure(actor,identity.TraitId);
+                else if(actor.hasTrait(identity.TraitId))CombatBridge.RemoveTrait(actor,identity.TraitId);
+            }
+        }
+        public static string IdentityForDisplay(Actor actor)
+        {
+            CharacterProgression progress=ProgressForDisplay(actor);
+            if(progress==null)return "Nenhum";
+            ArcaneIdentity patron=ArcaneIdentities.Patron(progress.Arcane.PatronId),lineage=ArcaneIdentities.Lineage(progress.Arcane.Origin);
+            return (patron!=null?patron.Name:"")+(patron!=null && lineage!=null?" / ":"")+(lineage!=null?lineage.Name:"")+
+                (patron==null && lineage==null?"Nenhum":"");
+        }
+        public static string IdentityDetailsForDisplay(Actor actor)
+        {
+            CharacterProgression progress=ProgressForDisplay(actor);
+            if(progress==null)return "Pactos e origens surgem durante a formação; consultar a ficha não concede poderes.";
+            string result="";
+            foreach(ArcaneTradition tradition in new[]{ArcaneTradition.Warlock,ArcaneTradition.Sorcerer})
+            {
+                ArcaneIdentity identity=ArcaneIdentities.For(progress.Arcane,tradition);
+                if(identity==null)continue;
+                result+=(result.Length>0?"\n":"")+"<b>"+identity.Name+"</b> · "+identity.Attributes.Describe()+" · Mana +"+identity.ManaBonus;
+            }
+            return result.Length>0?result:NaturalMagicRules.Status(progress);
         }
         public static void Ensure(Actor actor,string trait)
         {
@@ -69,12 +156,14 @@ namespace ArcaneMartialAscension.GameIntegration
         {Ensure(actor,ModTraits.WeaponTrait(type));}
         public static void GainWeaponXp(Actor actor,MartialWeaponType type,int xp)
         {
-            if(actor==null || !actor.isAlive()) return;
+            if(actor==null || !actor.isAlive() || xp<=0) return;
             ActorState s=State(actor);
+            if(s.PreserveSnapshot)return;
             s.Progress.TrainWeapon(type,xp);
             s.Progress.RecordOrigin(LearningRules.WeaponKnowledgeId(type),
                 new KnowledgeOrigin(KnowledgeSource.Player,World.world!=null?World.world.getCurWorldTime():0,actor.getID()));
             s.Progress.Learning.LastAction="Treino solicitado pelo jogador: "+LearningRules.WeaponName(type);
+            TechniqueRules.LearnFromTraining(s.Progress,type,KnowledgeSource.Player,WorldTime,actor.getID());
             MartialWeaponType equipped;
             SyncWeaponTraits(actor,GameWeaponDetector.TryDetect(actor,out equipped)?(MartialWeaponType?)equipped:null);
         }
@@ -88,25 +177,43 @@ namespace ArcaneMartialAscension.GameIntegration
         {return OnWeaponAttack(a,b,MartialWeaponType.Axe);}
         private static bool OnWeaponAttack(BaseSimObject attacker,BaseSimObject defender,MartialWeaponType type)
         {
-            if(attacker==null || !attacker.isAlive() || attacker.a==null || defender==null || !defender.isAlive()) return false;
-            Actor caster=attacker.a;
-            MartialWeaponType equipped;
-            if(!GameWeaponDetector.TryDetect(caster,out equipped))return true;
-            type=equipped;
-            ActorState s=State(caster);
-            if(!LearningRules.AwardCombat(s.Progress,type,Time.frameCount,World.world.getCurWorldTime(),caster.getID()))return true;
-            SyncWeaponTraits(caster,type);
-            if(Time.time-s.LastSword>=1.2f)
-            {
-                s.LastSword=Time.time;
-                int level=s.Progress.GetWeaponLevel(type);
-                // Supplemental nonlethal chip damage makes mastery observable even if
-                // this WorldBox build ignores bonus stats on dynamically added traits.
-                if(defender!=null && defender.a!=null && level>0)
-                    CombatBridge.TryDamage(defender.a,Mathf.Min(9f,level*1.3f),caster);
-                if(Main.Visuals!=null) Main.Visuals.SpawnSwordArc(GameCompat.PositionOrCursor(attacker));
-            }
+            // Trait callbacks describe attempts, not confirmed hits. The observer owns XP.
             return true;
+        }
+        public static void OnConfirmedWeaponHit(Actor caster,Actor target,MartialWeaponType used,int healthLost)
+        {
+            if(caster==null || !caster.isAlive() || !caster.isSapient() || !caster.isAdult() || healthLost<=0 || World.world==null || World.world.isPaused())return;
+            ActorState s=State(caster);
+            if(s.PreserveSnapshot)return;
+            if(s.LastWeaponHitFrame==Time.frameCount)return;
+            s.LastWeaponHitFrame=Time.frameCount;
+            int before=s.Progress.GetWeaponLevel(used);
+            bool gained=LearningRules.AwardCombat(s.Progress,used,Time.frameCount,WorldTime,caster.getID());
+            MartialWeaponType current;
+            MartialWeaponType? equipped=GameWeaponDetector.TryDetect(caster,out current)?(MartialWeaponType?)current:null;
+            SyncWeaponTraits(caster,equipped);
+            if(gained && s.Progress.GetWeaponLevel(used)>before)
+                Debug.Log("[AMA Martial] mastery actor="+caster.getID()+" weapon="+used+" level="+s.Progress.GetWeaponLevel(used)+" source=confirmed_hit");
+            if(target==null || !target.isAlive() || equipped!=used || !caster.canAttackTarget(target,true,false))return;
+            foreach(TechniqueEntry technique in TechniqueCatalog.ForWeapon(used))
+            {
+                double now=WorldTime;
+                if(!TechniqueRules.CanUse(s.Progress,technique,equipped,now))continue;
+                int hp=target.getHealth();
+                CombatBridge.TryDamage(target,TechniqueRules.Damage(s.Progress,technique),caster);
+                int loss=Math.Max(0,hp-Math.Max(0,target.getHealth()));
+                if(!TechniqueRules.ConfirmHit(s.Progress,technique,equipped,now,loss))continue;
+                s.LastTechnique=technique.Name+" "+s.Progress.Techniques.Get(technique.Id).Rank+" · dano adicional "+loss;
+                if(Time.time-s.LastDiagnostic>10)
+                {s.LastDiagnostic=Time.time;Debug.Log("[AMA Technique] applied actor="+caster.getID()+" technique="+technique.Id+" hp="+hp+"->"+target.getHealth());}
+                try
+                {
+                    if(Main.Visuals!=null && used!=MartialWeaponType.Bow)Main.Visuals.SpawnSwordArc(GameCompat.PositionOrCursor(caster),GameCompat.PositionOrCursor(target));
+                    ScreenEffects.Emit(target,1,ColorFor(MagicSchool.Transmutation),technique.Name,false);
+                }
+                catch(Exception error){Debug.LogWarning("[AMA Technique] Dano aplicado; falha visual: "+error.Message);}
+                break;
+            }
         }
         public static bool OnWizardAttack(BaseSimObject a,BaseSimObject b,WorldTile t)
         {return OnMagicAttack(a,b,ArcaneTradition.Wizard);}
@@ -127,6 +234,7 @@ namespace ArcaneMartialAscension.GameIntegration
             if(a==null || !a.isAlive() || a.a==null) return false;
             Actor actor=a.a;
             ActorState s=State(actor);
+            if(s.PreserveSnapshot)return true;
             if(Time.time-s.LastAura<5f) return true;
             if(!s.Progress.HasAwakenedAura) s.Progress.AwakenAura();
             if(s.Progress.UseAura(6f))
@@ -139,8 +247,9 @@ namespace ArcaneMartialAscension.GameIntegration
         public static void TriggerAura(Actor actor)
         {
             if(actor==null || !actor.isAlive()) return;
-            Ensure(actor,ModTraits.Aura);
             ActorState s=State(actor);
+            if(s.PreserveSnapshot)return;
+            Ensure(actor,ModTraits.Aura);
             if(!s.Progress.HasAwakenedAura)s.Progress.AwakenAura();
             if(s.Progress.UseAura(5f) && Main.Visuals!=null)
                 Main.Visuals.SpawnAuraPulse(GameCompat.PositionOrCursor(actor));
@@ -155,18 +264,21 @@ namespace ArcaneMartialAscension.GameIntegration
         {
             if(actor==null || !actor.isAlive()) return;
             ActorState s=State(actor);
-            s.Progress.Arcane.Study(ArcaneTradition.Wizard,250);
+            if(s.PreserveSnapshot)return;
+            s.Progress.Arcane.Study(TraditionFor(actor),250);
             s.Progress.GrowMana(s.Progress.Arcane.HighestCircle);
         }
         public static string Learn(Actor actor,SpellEntry spell)
         {
             if(actor==null || !actor.isAlive() || spell==null) return "Sem personagem/magia";
             ActorState s=State(actor);
-            if(s.Progress.Arcane.GetCircle(ArcaneTradition.Wizard)<spell.Circle) return "Circulo insuficiente; estudar magia F12";
+            if(s.PreserveSnapshot)return "Progresso incompatível ou inválido; dados originais preservados.";
+            ArcaneTradition tradition=TraditionFor(actor);
+            if(s.Progress.Arcane.GetCircle(tradition)<spell.Circle) return "Círculo insuficiente nesta tradição; estudar magia F12";
             if(s.Progress.Arcane.Knows(spell.Id))return "Magia ja aprendida: "+spell.Name;
-            if(!LearningRules.Learn(s.Progress,spell,KnowledgeSource.Player,World.world!=null?World.world.getCurWorldTime():0,actor.getID()))
-                return "Requisitos de aprendizado não atendidos.";
-            Ensure(actor,ModTraits.Wizard);
+            if(!LearningRules.Learn(s.Progress,spell,KnowledgeSource.Player,WorldTime,actor.getID(),tradition))
+                return "Requisitos não atendidos: confira círculo, pacto ou origem inata.";
+            Ensure(actor,TraditionTrait(tradition));
             Ensure(actor,ModTraits.SchoolTrait(spell.School));
             return "Aprendeu: "+spell.Name;
         }
@@ -180,13 +292,40 @@ namespace ArcaneMartialAscension.GameIntegration
         public static CharacterProgression ProgressForDisplay(Actor actor)
         {
             ActorState state;
-            return actor!=null && states.TryGetValue(actor,out state)?state.Progress:null;
+            if(actor==null || !actor.isAlive())return null;
+            ActorData data=DataFor(actor);
+            if(states.TryGetValue(actor,out state) && state.ActorId==actor.getID() && ReferenceEquals(state.Data,data))return state.Progress;
+            string json=null;if(data!=null)data.get(ActorProgressionPersistence.Key,out json,null);
+            return string.IsNullOrEmpty(json)?null:State(actor).Progress;
         }
         public static KnowledgeOrigin OriginForDisplay(Actor actor,string knowledgeId)
         {
             CharacterProgression progress=ProgressForDisplay(actor);
             return progress!=null?progress.GetOrigin(knowledgeId):null;
         }
+        private static string TraditionTrait(ArcaneTradition tradition)
+        {return tradition==ArcaneTradition.Warlock?ModTraits.Warlock:tradition==ArcaneTradition.Sorcerer?ModTraits.Sorcerer:ModTraits.Wizard;}
+        private static ArcaneTradition? ExistingTradition(Actor actor)
+        {
+            if(actor.hasTrait(ModTraits.Warlock))return ArcaneTradition.Warlock;
+            if(actor.hasTrait(ModTraits.Sorcerer))return ArcaneTradition.Sorcerer;
+            return actor.hasTrait(ModTraits.Wizard)?(ArcaneTradition?)ArcaneTradition.Wizard:null;
+        }
+        private static ArcaneTradition TraditionFor(Actor actor)
+        {
+            CharacterProgression progress=ProgressForDisplay(actor);
+            return (progress!=null?progress.Formation.Tradition:null)??ExistingTradition(actor)??ArcaneTradition.Wizard;
+        }
+        public static bool CanLearnForDisplay(Actor actor,SpellEntry spell)
+        {
+            if(actor==null || !actor.isAlive() || spell==null)return false;
+            CharacterProgression progress=ProgressForDisplay(actor);
+            ActorState existingState;if(states.TryGetValue(actor,out existingState) && existingState.PreserveSnapshot)return false;
+            if(progress==null)return spell.Circle==0 && TraditionFor(actor)==ArcaneTradition.Wizard;
+            return !progress.Arcane.Knows(spell.Id) && progress.Arcane.CanLearn(new SpellDefinition(spell.Id,spell.School,spell.Circle,spell.Mana),TraditionFor(actor));
+        }
+        public static string FormationForDisplay(Actor actor)
+        {return NaturalMagicRules.Status(ProgressForDisplay(actor));}
 
         public static string LearningStatusForDisplay(Actor actor)
         {
@@ -195,33 +334,48 @@ namespace ArcaneMartialAscension.GameIntegration
             if(actor._has_status_sleeping)return "Descansando; estudo e prática aguardam.";
             if(actor.attack_target!=null && actor.attack_target.isAlive())return "Em combate; estudo em paz interrompido.";
             CharacterProgression progress=ProgressForDisplay(actor);
-            return progress!=null?progress.Learning.LastAction:"Aguardando vocação arcana ou uma arma equipada.";
+            ActorState existingState;if(states.TryGetValue(actor,out existingState) && existingState.PreserveSnapshot)return "Progresso incompatível ou inválido; dados originais preservados.";
+            return progress!=null && progress.Formation.Tradition.HasValue && !progress.Formation.Ready?NaturalMagicRules.Status(progress):
+                progress!=null?progress.Learning.LastAction:"Aguardando vocação arcana ou uma arma equipada.";
         }
 
         public static void ObserveLearning(Actor actor,double now)
         {
             if(actor==null || !actor.isAlive() || !actor.isSapient() || !actor.isAdult())return;
             long id=actor.getID();
-            bool wizard=actor.hasTrait(ModTraits.Wizard);
-            bool otherPath=actor.hasTrait(ModTraits.Warlock) || actor.hasTrait(ModTraits.Sorcerer);
-            bool magic=wizard || (!otherPath && (actor.hasTrait(ModTraits.Evocation) || LearningRules.HasArcaneAptitude(id)));
+            ArcaneTradition? existing=ExistingTradition(actor);
+            if(!existing.HasValue && actor.hasTrait(ModTraits.Evocation))existing=ArcaneTradition.Wizard;
+            bool candidate=existing.HasValue || LearningRules.HasArcaneAptitude(id);
             MartialWeaponType weapon;
             bool armed=GameWeaponDetector.TryDetect(actor,out weapon);
             ActorState state;
-            if(!magic && !armed && !states.TryGetValue(actor,out state))
+            if(!candidate && !armed && !states.TryGetValue(actor,out state))
             {SyncWeaponTraits(actor,null);return;}
             state=State(actor);
+            if(state.PreserveSnapshot)return;
+            bool available=!actor._has_status_sleeping && (actor.attack_target==null || !actor.attack_target.isAlive());
+            bool formed=NaturalMagicRules.Observe(state.Progress,new FormationContext{
+                ActorId=id,WorldTime=now,Eligible=true,Available=available,ExistingTradition=existing
+            });
+            ArcaneFormation formation=state.Progress.Formation;
+            if(formed)
+            {
+                Ensure(actor,TraditionTrait(formation.Tradition.Value));
+                SyncIdentityTraits(actor,state.Progress);
+                Debug.Log("[AMA Formation] actor="+id+" tradition="+formation.Tradition+" patron="+state.Progress.Arcane.PatronId+" origin="+state.Progress.Arcane.Origin+" worldTime="+now);
+            }
             int before=armed?state.Progress.GetWeaponLevel(weapon):0;
             LearningOutcome outcome=LearningRules.Tick(state.Progress,new LearningContext{
-                ActorId=id,WorldTime=now,Eligible=true,MagicEligible=magic,
-                Available=!actor._has_status_sleeping && (actor.attack_target==null || !actor.attack_target.isAlive()),
+                ActorId=id,WorldTime=now,Eligible=true,MagicEligible=formation.Ready,
+                Tradition=formation.Tradition??ArcaneTradition.Wizard,
+                Available=available && (!formation.Tradition.HasValue || formation.Ready),
                 Weapon=armed?(MartialWeaponType?)weapon:null
             });
             if(outcome.LearnedSpell!=null)
             {
-                Ensure(actor,ModTraits.Wizard);
+                Ensure(actor,TraditionTrait(formation.Tradition??ArcaneTradition.Wizard));
                 Ensure(actor,ModTraits.SchoolTrait(outcome.LearnedSpell.School));
-                Debug.Log("[AMA Learning] learned actor="+id+" spell="+outcome.LearnedSpell.Id+" source=self_study worldTime="+now);
+                Debug.Log("[AMA Learning] learned actor="+id+" spell="+outcome.LearnedSpell.Id+" tradition="+formation.Tradition+" source="+NaturalMagicRules.Source(formation.Tradition??ArcaneTradition.Wizard)+" worldTime="+now);
             }
             SyncWeaponTraits(actor,armed?(MartialWeaponType?)weapon:null);
             if(armed && state.Progress.GetWeaponLevel(weapon)>before)
@@ -232,6 +386,7 @@ namespace ArcaneMartialAscension.GameIntegration
         {
             if(actor==null || !actor.isAlive())return;
             CharacterProgression progress=ProgressForDisplay(actor);
+            ActorState existingState;if(states.TryGetValue(actor,out existingState) && existingState.PreserveSnapshot)return;
             for(int i=0;i<4;i++)
             {
                 MartialWeaponType type=(MartialWeaponType)i;
@@ -240,8 +395,8 @@ namespace ArcaneMartialAscension.GameIntegration
                 if(active)Ensure(actor,trait);
                 else if(actor.hasTrait(trait))CombatBridge.RemoveTrait(actor,trait);
                 int level=active && progress!=null?progress.GetWeaponLevel(type):0;
-                int tier=level>=6?3:level>=4?2:level>=2?1:0;
-                for(int rank=1;rank<=3;rank++)
+                int tier=level;
+                for(int rank=1;rank<=TraitAttributeCatalog.MaxWeaponLevel;rank++)
                 {
                     string rankId=ModTraits.RankId(type,rank);
                     if(active && rank==tier)Ensure(actor,rankId);
@@ -251,12 +406,15 @@ namespace ArcaneMartialAscension.GameIntegration
         }
 
         public static void ResetLearningObservation()
-        {foreach(ActorState state in states.Values)state.Progress.Learning.ResetObservation();}
+        {foreach(ActorState state in states.Values){state.Progress.Learning.ResetObservation();state.Progress.Formation.ResetObservation();}}
 
         public static void ResetRuntimeForWorld()
         {
             foreach(PendingCast cast in pending)Finish(cast,"Mundo alterado; conjuração cancelada sem custo.");
             pending.Clear();states.Clear();combatActors.Clear();
+            ScreenEffects.Clear();
+            if(Main.Visuals!=null)Main.Visuals.ClearEffects();
+            WeaponHitObserver.ResetWorld();
             combatOffset=weaponScanOffset=0;nextCombatUpdate=lastWeaponScan=lastCleanup=0;
             LastMessage=null;MessageUntil=0;
         }
@@ -274,87 +432,92 @@ namespace ArcaneMartialAscension.GameIntegration
             if(manual){LastMessage=outcome;MessageUntil=Time.unscaledTime+5f;Debug.Log("[AMA Cast] manual: "+outcome);}
             return outcome;
         }
+        private static SpellCastRequest Request(Actor caster,Actor target,SpellEntry spell,bool manual)
+        {
+            bool alive=caster!=null && caster.isAlive(),targetAlive=target!=null && target.isAlive();
+            SpellTargetRelation relation=SpellTargetRelation.None;
+            if(alive && targetAlive)
+                relation=caster==target?SpellTargetRelation.Self:caster.canAttackTarget(target,true,false)?SpellTargetRelation.Enemy:SpellTargetRelation.Ally;
+            return new SpellCastRequest{Spell=spell,CasterId=alive?caster.getID():0,TargetId=targetAlive?target.getID():0,
+                CasterAlive=alive,TargetAlive=targetAlive,Paused=World.world==null || World.world.isPaused(),WorldTime=WorldTime,
+                HasSchool=alive && spell!=null && caster.hasTrait(ModTraits.SchoolTrait(spell.School)),Manual=manual,Relation=relation,
+                TargetHasWeapon=targetAlive && target.getWeapon()!=null,
+                Distance=alive && targetAlive?Vector2.Distance(caster.current_position,target.current_position):0};
+        }
         private static string BeginCast(Actor caster,Actor target,SpellEntry spell,bool manual)
         {
             if(caster==null || !caster.isAlive() || spell==null)return "Sem conjurador ou magia";
-            if(World.world==null)return "Mundo indisponível; mana preservada.";
-            if(World.world.isPaused())return "Retome o jogo para conjurar. Mana preservada.";
-            if(!SpellCatalog.HasRuntime(spell))return "Mecanica pendente (sem custo): "+spell.Name;
-            if(spell.Mana<=0 || float.IsNaN(spell.Mana) || float.IsInfinity(spell.Mana))return "Custo inválido; mana preservada.";
-            ActorState s=State(caster);
-            if(s.Pending!=null)return "Já está lançando "+s.Pending.Spell.Name;
-            if(!manual && !caster.hasTrait(ModTraits.SchoolTrait(spell.School)))return "Precisa do traco da escola";
-            if(!s.Progress.Arcane.Knows(spell.Id))return "Magia nao aprendida: clique Aprender";
-            if(s.Progress.Arcane.HighestCircle<spell.Circle)return "Circulo bloqueado: treine magia";
-            float last;
-            if(s.Cooldowns.TryGetValue(spell.Id,out last) && Time.time-last<spell.Cooldown)
-                return "Recarga: "+Mathf.CeilToInt(spell.Cooldown-(Time.time-last))+"s";
-            if(s.Progress.Mana<spell.Mana)return "Mana insuficiente";
-            Color color=ColorFor(spell.School);
-            if(IsOffensive(spell))
+            SpellRuntimeProfile profile=SpellRuntimeCatalog.Find(spell);
+            if(profile!=null && (profile.TargetRule==SpellTargetRule.Self || (profile.TargetRule==SpellTargetRule.Friendly && target==null)))target=caster;
+            ActorState state=State(caster);
+            if(state.PreserveSnapshot)return "Progresso incompatível ou inválido; dados originais preservados. Mana preservada.";
+            SpellCastRequest request=Request(caster,target,spell,manual);
+            if(profile!=null && profile.Delivery==SpellDelivery.Projectile && pending.Count>=128)return "Limite de projéteis atingido; mana preservada.";
+            SpellCastTicket ticket;
+            SpellCastResult error=state.Casting.TryReserve(request,out ticket);
+            if(error!=null)return error.Message;
+            bool transferred=false;
+            try
             {
-                if(target==null || target==caster || !target.isAlive())return "Aponte para um alvo vivo diferente do mago. Mana preservada.";
-                float distance=Vector2.Distance(caster.current_position,target.current_position);
-                if(distance>Range(spell))return "Alvo fora do alcance ("+Mathf.CeilToInt(distance)+" / "+Range(spell)+"). Mana preservada.";
-                if(pending.Count>=128)return "Muitas conjurações em andamento; tente novamente.";
-                if(manual){Ensure(caster,ModTraits.Wizard);Ensure(caster,ModTraits.SchoolTrait(spell.School));}
+                if(profile.Delivery==SpellDelivery.Instant)
+                {
+                    SpellCastResult result=state.Casting.Complete(ticket,request,new SpellEffectExecutor(caster,target,ApplyTemporaryTrait));
+                    if(result.Applied)
+                    {
+                        Debug.Log("[AMA Cast] applied spell="+spell.Id+" caster="+caster.getID()+" target="+target.getID()+" damage="+result.HealthLost+" mana="+state.Progress.Mana+" manual="+manual);
+                        try
+                        {
+                            ScreenEffects.Emit(target,2,ColorFor(spell.School),spell.Name,false);
+                            if(Main.Visuals!=null)
+                            {
+                                Vector3 start=GameCompat.PositionOrCursor(caster),end=GameCompat.PositionOrCursor(target);
+                                Main.Visuals.SpawnCircle(start,spell.Circle,ColorFor(spell.School));
+                                if(spell.Id=="ama.spell.evocation.1.lanca_eletrica")Main.Visuals.SpawnLightning(start,end);
+                                else Main.Visuals.SpawnImpact(end,ColorFor(spell.School));
+                            }
+                        }
+                        catch(Exception visualError){Debug.LogWarning("[AMA VFX] Efeito aplicado; falha visual: "+visualError.Message);}
+                    }
+                    return result.Message+(result.Applied?" Mana -"+result.ManaSpent:"");
+                }
                 Vector3 from,to;
                 if(!GameCompat.GetPosition(caster,out from) || !GameCompat.GetPosition(target,out to))return "Posição indisponível; mana preservada.";
-                PendingCast cast=new PendingCast{Caster=caster,Target=target,State=s,Spell=spell,
-                    From=from+Vector3.up*.5f,Duration=Mathf.Clamp(distance/12f,.55f,1.1f),Manual=manual};
-                cast.Log=manual || Time.time-s.LastDiagnostic>10f;
-                if(cast.Log)s.LastDiagnostic=Time.time;
-                s.Pending=cast;
-                pending.Add(cast);
+                var cast=new PendingCast{Caster=caster,Target=target,State=state,Spell=spell,Ticket=ticket,
+                    From=from+Vector3.up*.5f,Duration=Mathf.Clamp(request.Distance/12f,.55f,1.1f),Manual=manual,LastWorldTime=WorldTime};
+                cast.Log=manual || Time.time-state.LastDiagnostic>10f;
+                if(cast.Log)state.LastDiagnostic=Time.time;
+                state.Pending=cast;pending.Add(cast);transferred=true;
                 try
                 {
+                    Color color=ColorFor(spell.School);
                     cast.Flight=ScreenEffects.Launch(cast.From,to+Vector3.up*.5f,color);
                     if(Main.Visuals!=null)
-                    {
-                        Main.Visuals.SpawnCircle(from,spell.Circle,color);
-                        cast.Sprite=Main.Visuals.SpawnBolt(cast.From,color);
-                    }
+                    {Main.Visuals.SpawnCircle(from,spell.Circle,color);cast.Sprite=Main.Visuals.SpawnBolt(cast.From,color);}
                     else ScreenEffects.Emit(from,0,color,"CÍRCULO "+spell.Circle,false);
                 }
-                catch(Exception error){Debug.LogWarning("[AMA VFX] Falha visual; o projétil mantém sua simulação: "+error);}
-                if(cast.Log)Debug.Log("[AMA Cast] launched spell="+spell.Id+" caster="+caster.getID()+" target="+target.getID()+" mana="+s.Progress.Mana);
+                catch(Exception visualError){Debug.LogWarning("[AMA VFX] Falha visual; a simulação continua: "+visualError);}
+                if(cast.Log)Debug.Log("[AMA Cast] launched spell="+spell.Id+" caster="+caster.getID()+" target="+target.getID()+" mana="+state.Progress.Mana+" manual="+manual);
                 return "Lançando "+spell.Name+" em "+GameCompat.DisplayName(target);
             }
-            if(manual){Ensure(caster,ModTraits.Wizard);Ensure(caster,ModTraits.SchoolTrait(spell.School));}
-            bool applied=false;
-            if(spell.Category=="escudo" || spell.Category=="melhoria" ||
-                spell.Category=="deteccao" || spell.Category=="ilusao" ||
-                spell.Category=="controle" || spell.Category=="enfraquecimento")
-            {
-                string buff=ModTraits.SpellBoost;
-                if(spell.Category=="escudo")buff=ModTraits.SpellShield;
-                if(spell.Category=="deteccao")buff=ModTraits.SpellFocus;
-                if(spell.Category=="ilusao")buff=ModTraits.SpellIllusion;
-                if(spell.Category=="controle"||spell.Category=="enfraquecimento")buff=ModTraits.SpellWeaken;
-                bool hostile=spell.Category=="controle"||spell.Category=="enfraquecimento";
-                Actor recipient=hostile?target:caster;
-                if(recipient==null || !recipient.isAlive() || (hostile && recipient==caster))
-                    return "Aponte para um alvo valido";
-                Ensure(recipient,buff);
-                ActorState state=State(recipient);
-                state.Temporary[buff]=Time.time+Mathf.Max(4f,3f+spell.Circle*2f);
-                applied=recipient.hasTrait(buff);
-            }
-            if(!applied) return "Efeito do jogo indisponivel; sem consumo de mana";
-            if(!s.Progress.CastSpell(spell.Mana))return "Mana insuficiente";
-            s.Cooldowns[spell.Id]=Time.time;
-            s.Progress.Arcane.Study(ArcaneTradition.Wizard,8+spell.Circle*2);
-            s.Progress.StudyMagic(spell.School,8+spell.Circle*2);
-            Vector3 casterPosition;
-            if(Main.Visuals!=null && GameCompat.GetPosition(caster,out casterPosition))Main.Visuals.SpawnCircle(casterPosition,spell.Circle,color);
-            if(target!=null) ScreenEffects.Emit(target,3,color,"IMPACTO",false);
-            return "OK: "+spell.Name+" | mana -"+spell.Mana;
+            finally {if(!transferred)state.Casting.Cancel(ticket);}
         }
-
+        private static bool ApplyTemporaryTrait(Actor recipient,string trait,float duration)
+        {
+            if(recipient==null || !recipient.isAlive() || string.IsNullOrEmpty(trait) || duration<=0 || AssetManager.traits.get(trait)==null)return false;
+            ActorState state=State(recipient);
+            double until=WorldTime+duration,previous;
+            if(recipient.hasTrait(trait))
+            {
+                // A permanent/player-granted trait must never become removable by this cast.
+                if(!state.Temporary.TryGetValue(trait,out previous) || until<=previous)return false;
+                state.Temporary[trait]=until;return true;
+            }
+            Ensure(recipient,trait);
+            if(!recipient.hasTrait(trait))return false;
+            state.Temporary[trait]=until;return true;
+        }
         private static bool IsOffensive(SpellEntry spell)
-        {return spell!=null && (spell.Category=="dano" || spell.Category=="dreno_vital" || spell.Category=="dano_em_area");}
-        private static float Range(SpellEntry spell){return 16f+spell.Circle*6f;}
-
+        {SpellRuntimeProfile profile=SpellRuntimeCatalog.Find(spell);return profile!=null && profile.TargetRule==SpellTargetRule.Hostile;}
         public static void PrepareForCombat(Actor actor,SpellEntry spell)
         {
             ActorState state;
@@ -371,7 +534,8 @@ namespace ArcaneMartialAscension.GameIntegration
                 PendingCast cast=pending[i];
                 if(cast.Caster==null || !cast.Caster.isAlive() || cast.Target==null || !cast.Target.isAlive())
                 {Finish(cast,"Conjuração interrompida: alvo ou conjurador indisponível. Mana preservada.");pending.RemoveAt(i);continue;}
-                cast.Age+=Time.deltaTime;
+                double now=WorldTime;
+                cast.Age+=(float)Math.Max(0,now-cast.LastWorldTime);cast.LastWorldTime=now;
                 Vector3 targetPosition;
                 if(!GameCompat.GetPosition(cast.Target,out targetPosition))
                 {Finish(cast,"Alvo sem posição; mana preservada.");pending.RemoveAt(i);continue;}
@@ -404,9 +568,9 @@ namespace ArcaneMartialAscension.GameIntegration
         private static void TryAutomaticCast(Actor caster,Actor target,ActorState state)
         {
             if(World.world==null || World.world.isPaused() || state.Pending!=null || target==null || !target.isAlive() ||
-                Time.time-state.LastMagic<.75f)return;
+                WorldTime-state.LastMagic<.75)return;
             if(!caster.hasTrait(ModTraits.Wizard) && !caster.hasTrait(ModTraits.Warlock) && !caster.hasTrait(ModTraits.Sorcerer))return;
-            state.LastMagic=Time.time;
+            state.LastMagic=WorldTime;
             try {if(!caster.canAttackTarget(target,true,false))return;}
             catch(Exception error)
             {
@@ -414,65 +578,33 @@ namespace ArcaneMartialAscension.GameIntegration
                 {state.LastDiagnostic=Time.time;Debug.LogWarning("[AMA AI] Falha ao validar alvo de combate: "+error.Message);}
                 return;
             }
-            SpellEntry best=null;
-            foreach(string id in state.Progress.Arcane.KnownSpellIds)
+            SpellEntry best=SpellAiRules.Choose(state.Progress,state.Casting,spell=>Request(caster,target,spell,false),state.PreferredSpellId);
+            if(best!=null)
             {
-                SpellEntry spell=SpellCatalog.Find(id);
-                if(!IsOffensive(spell) || !SpellCatalog.HasRuntime(spell) || spell.Circle>state.Progress.Arcane.HighestCircle ||
-                    spell.Mana>state.Progress.Mana || !caster.hasTrait(ModTraits.SchoolTrait(spell.School)) ||
-                    Vector2.Distance(caster.current_position,target.current_position)>Range(spell))continue;
-                float used;
-                if(state.Cooldowns.TryGetValue(spell.Id,out used) && Time.time-used<spell.Cooldown)continue;
-                if(spell.Id==state.PreferredSpellId){best=spell;break;}
-                if(best==null || spell.Circle>best.Circle)best=spell;
+                if(Time.time-state.LastDiagnostic>10)Debug.Log("[AMA AI] casting actor="+caster.getID()+" tradition="+state.Progress.Arcane.TraditionFor(best.Id)+" spell="+best.Id+" target="+target.getID());
+                Cast(caster,target,best,false);
             }
-            if(best!=null)Cast(caster,target,best,false);
         }
 
         private static void ResolveImpact(PendingCast cast,Vector3 impact)
         {
-            ActorState state=cast.State;
-            SpellEntry spell=cast.Spell;
-            if(state.Progress.Mana<spell.Mana){Finish(cast,"Mana insuficiente no impacto; sem cobrança.");return;}
             int before=cast.Target.getHealth();
-            float potency=8f+6f*spell.Circle;
-            bool applied=CombatBridge.TryDamage(cast.Target,potency,cast.Caster);
-            int after=cast.Target.getHealth();
-            if(!applied){Finish(cast,"O alvo não recebeu dano (proteção ou imunidade). Mana preservada.");return;}
-            // No other cast can spend this actor's mana while its projectile is in flight.
-            if(!state.Progress.CastSpell(spell.Mana))throw new InvalidOperationException("Dano aplicado sem mana reservada.");
-            state.Cooldowns[spell.Id]=Time.time;
-            state.Progress.Arcane.Study(ArcaneTradition.Wizard,8+spell.Circle*2);
-            state.Progress.StudyMagic(spell.School,8+spell.Circle*2);
-            if(cast.Log)Debug.Log("[AMA Cast] applied spell="+spell.Id+" caster="+cast.Caster.getID()+" target="+cast.Target.getID()+
-                " hp="+before+"->"+after+" mana="+state.Progress.Mana+" cooldown="+spell.Cooldown);
-            try
-            {
-                if(spell.Category=="dreno_vital")CombatBridge.TryHeal(cast.Caster,(before-after)*.5f);
-                if(spell.Category=="dano_em_area")
-                {
-                    int hits=0;
-                    foreach(Actor nearby in World.world.units)
-                    {
-                        if(nearby==null || nearby==cast.Target || nearby==cast.Caster || !nearby.isAlive())continue;
-                        if(Vector2.Distance(cast.Target.current_position,nearby.current_position)>2.5f || !cast.Caster.canAttackTarget(nearby,true,false))continue;
-                        CombatBridge.TryDamage(nearby,potency*.5f,cast.Caster);
-                        if(++hits>=5)break;
-                    }
-                }
-            }
-            catch(Exception error){Debug.LogWarning("[AMA Cast] Impacto principal aplicado; efeito secundário falhou: "+error);}
-            Finish(cast,spell.Name+": impacto! Vida "+before+" → "+Mathf.Max(0,after)+" · Mana -"+spell.Mana);
-            try {ScreenEffects.Emit(impact,2,ColorFor(spell.School),"-"+(before-after)+" VIDA",false);}
-            catch(Exception error){Debug.LogWarning("[AMA VFX] Impacto aplicado; falha visual: "+error.Message);}
+            SpellCastResult result=cast.State.Casting.Complete(cast.Ticket,Request(cast.Caster,cast.Target,cast.Spell,cast.Manual),
+                new SpellEffectExecutor(cast.Caster,cast.Target,ApplyTemporaryTrait));
+            if(result.Applied && cast.Log)Debug.Log("[AMA Cast] applied spell="+cast.Spell.Id+" caster="+cast.Caster.getID()+" target="+cast.Target.getID()+
+                " hp="+before+"->"+cast.Target.getHealth()+" damage="+result.HealthLost+" mana="+cast.State.Progress.Mana+" cooldown="+cast.Spell.Cooldown);
+            Finish(cast,result.Message+(result.Applied?" Vida -"+result.HealthLost+" · Mana -"+result.ManaSpent:""));
+            if(result.Applied)
+                try {ScreenEffects.Emit(impact,2,ColorFor(cast.Spell.School),"-"+result.HealthLost+" VIDA",false);if(Main.Visuals!=null)Main.Visuals.SpawnImpact(impact,ColorFor(cast.Spell.School));}
+                catch(Exception error){Debug.LogWarning("[AMA VFX] Impacto aplicado; falha visual: "+error.Message);}
         }
-
         private static void Finish(PendingCast cast,string result)
         {
+            cast.State.Casting.Cancel(cast.Ticket);
             cast.State.Pending=null;
             cast.State.LastCast=result;
             if(cast.Flight!=null)ScreenEffects.Finish(cast.Flight);
-            if(cast.Sprite!=null)UnityEngine.Object.Destroy(cast.Sprite.gameObject);
+            if(cast.Sprite!=null && Main.Visuals!=null)Main.Visuals.Release(cast.Sprite);
             if(cast.Manual){LastMessage=result;MessageUntil=Time.unscaledTime+5f;}
             if(cast.Log)Debug.Log("[AMA Cast] result spell="+cast.Spell.Id+": "+result);
         }
@@ -484,6 +616,16 @@ namespace ArcaneMartialAscension.GameIntegration
             if(state.Pending!=null)return "Lançando "+state.Pending.Spell.Name;
             if(!string.IsNullOrEmpty(state.LastCast))return state.LastCast;
             return "Automático: aguardando um inimigo em combate.";
+        }
+        public static string TechniqueStatusForDisplay(Actor actor)
+        {ActorState state;return actor!=null && states.TryGetValue(actor,out state) && !string.IsNullOrEmpty(state.LastTechnique)?state.LastTechnique:"Técnicas aprendidas são usadas automaticamente após acertos válidos.";}
+        public static string DiagnosticForDisplay(Actor actor)
+        {
+            ActorState state;
+            Actor target=null;
+            if(actor!=null && states.TryGetValue(actor,out state) && state.Pending!=null)target=state.Pending.Target;
+            else if(actor!=null && actor.attack_target!=null)target=actor.attack_target.a;
+            return "Alvo: "+(target!=null?GameCompat.DisplayName(target):"nenhum")+"\n"+CombatStatusForDisplay(actor);
         }
         public static Color ColorFor(MagicSchool s)
         {
@@ -544,8 +686,8 @@ namespace ArcaneMartialAscension.GameIntegration
                 if(actor==null || !actor.isAlive()){dead.Add(actor);continue;}
                 ActorState s=entry.Value;
                 List<string> expired=new List<string>();
-                foreach(KeyValuePair<string,float> buff in s.Temporary)
-                    if(Time.time>=buff.Value)
+                foreach(KeyValuePair<string,double> buff in s.Temporary)
+                    if(WorldTime>=buff.Value)
                     {
                         if(CombatBridge.RemoveTrait(actor,buff.Key))expired.Add(buff.Key);
                         // If removeTrait API is unavailable, refrain from retry spam;
