@@ -26,6 +26,8 @@ namespace ArcaneMartialAscension.Core
     {
         private readonly Dictionary<ArcaneTradition, int> experience = new Dictionary<ArcaneTradition, int>();
         private readonly HashSet<string> learnedSpells = new HashSet<string>(StringComparer.Ordinal);
+        public IEnumerable<string> KnownSpellIds {get{return learnedSpells;}}
+        public static readonly int[] CircleXpThresholds={0,100,250,500,900,1500,2400,3600,5200,7500};
         public SorcerousOrigin Origin { get; private set; } = SorcerousOrigin.None;
         public string PatronId { get; private set; }
         public int GetExperience(ArcaneTradition tradition) => experience.TryGetValue(tradition, out int value) ? value : 0;
@@ -33,9 +35,8 @@ namespace ArcaneMartialAscension.Core
         public int GetCircle(ArcaneTradition tradition)
         {
             int xp = GetExperience(tradition);
-            int[] thresholds = { 0, 100, 250, 500, 900, 1500, 2400, 3600, 5200, 7500 };
             int circle = 0;
-            for (int i = 1; i < thresholds.Length; i++) if (xp >= thresholds[i]) circle = i;
+            for (int i = 1; i < CircleXpThresholds.Length; i++) if (xp >= CircleXpThresholds[i]) circle = i;
             return circle;
         }
         public int HighestCircle => Math.Max(GetCircle(ArcaneTradition.Wizard), Math.Max(GetCircle(ArcaneTradition.Warlock), GetCircle(ArcaneTradition.Sorcerer)));

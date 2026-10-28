@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ArcaneMartialAscension.Learning;
 
 namespace ArcaneMartialAscension.Core
 {
@@ -12,6 +13,12 @@ namespace ArcaneMartialAscension.Core
         private readonly Dictionary<WeaponType, int> weaponExperience = new Dictionary<WeaponType, int>();
 
         public ArcaneProgression Arcane { get; } = new ArcaneProgression();
+        public LearningProgress Learning {get;}=new LearningProgress();
+        private readonly Dictionary<string,KnowledgeOrigin> origins=new Dictionary<string,KnowledgeOrigin>(StringComparer.Ordinal);
+        public KnowledgeOrigin GetOrigin(string id)
+        {KnowledgeOrigin origin;return id!=null && origins.TryGetValue(id,out origin)?origin:null;}
+        public void RecordOrigin(string id,KnowledgeOrigin origin)
+        {if(!string.IsNullOrEmpty(id) && origin!=null && !origins.ContainsKey(id))origins.Add(id,origin);}
 
         public float Mana { get; private set; } = 100f;
         public float MaxMana { get; private set; } = 100f;

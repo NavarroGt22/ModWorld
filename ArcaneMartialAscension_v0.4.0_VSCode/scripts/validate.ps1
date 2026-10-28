@@ -21,7 +21,7 @@ foreach ($g in $groups) {
     if ($g.Count -ne 20) { throw "Escola $($g.Name) deve ter 20 magias" }
     foreach ($c in 0..9) {
         $atCircle = @($g.Group | Where-Object { $_.circulo -eq $c })
-        if ($atCircle.Count -ne 2) { throw "Escola $($g.Name), circulo $c: esperado 2" }
+        if ($atCircle.Count -ne 2) { throw "Escola $($g.Name), circulo ${c}: esperado 2" }
     }
 }
 $ids = @($catalog.magias | Select-Object -ExpandProperty id)

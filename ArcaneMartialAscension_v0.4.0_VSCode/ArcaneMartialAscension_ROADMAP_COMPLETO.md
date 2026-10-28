@@ -14,9 +14,35 @@ autonomamente.
 
 > **Nota de escopo:** o catálogo de 160 magias já está definido no
 > projeto v0.4.0, mas isso **não** significa que as 160 magias tenham
-> efeitos funcionais. A versão atual é uma base experimental, ainda não
-> confirmada em execução no WorldBox do usuário. O roadmap abaixo é a
+> efeitos funcionais. A versão atual é uma base experimental; compilação,
+> carregamento e F5 foram confirmados em 27/10/2026 (ver `docs/VALIDACAO_FASE_0.md`). O roadmap abaixo é a
 > proposta de evolução, não uma declaração de funcionalidades prontas.
+
+------------------------------------------------------------------------
+
+# Estado desta revisão — 27/10/2026
+
+- **Marco principal: Fase 1 em validação.** O critério mínimo da Fase 0
+  (compilar/carregar) foi observado. F5 mostrou o círculo GUI. Ainda falta
+  confirmar uma conjuração completa em combate após a última correção.
+- **Fase 2 parcialmente em código:** maestrias 0–7, leitura nativa de armas,
+  XP por treino/ataque e deduplicação de callbacks. As regras passaram em
+  testes automatizados; os quatro tipos ainda precisam de teste no jogo.
+- **Interface:** abas Maestrias e Grimório adicionadas à ficha. Isso não
+  conclui animações de combate ou os efeitos específicos das 160 magias.
+- **Fases 4 e 6 iniciadas como protótipo, a pedido do usuário:** estudo
+  próprio de quatro magias iniciais de Evocação, prática da arma equipada,
+  origem do conhecimento e processamento em lotes. 24 cenários de regras
+  passaram; não houve validação dessa IA dentro do WorldBox nesta revisão.
+- **Fase 5 pendente:** progressão e origens continuam em memória e não
+  são restauradas pelo save do jogo.
+- **Próximo aceite:** validar a magia em combate, observar aprendizado/XP
+  autônomos em mundo descartável e implementar persistência antes de
+  considerar a evolução autônoma estável.
+
+Evidências: `docs/VALIDACAO_FASE_0.md`, `docs/VALIDACAO_CONJURACAO.md`
+e `docs/VALIDACAO_APRENDIZADO.md`. Checkboxes futuros permanecem abertos
+quando ainda dependem de validação no jogo.
 
 ------------------------------------------------------------------------
 
@@ -78,8 +104,8 @@ Transformar o WorldBox em um mundo de fantasia com progressão emergente:
 
 ## 2.2 Pendências conhecidas e não verificadas
 
-- [ ] Compilação real com as DLLs do **WorldBox 0.51.2**.
-- [ ] Carregamento no **NeoModLoader 1.2.1.1** sem erros.
+- [x] Compilação real com as DLLs do **WorldBox 0.51.2** (27/10/2026; ver `docs/VALIDACAO_FASE_0.md`).
+- [x] Carregamento no **NeoModLoader 1.2.1.1** sem erros do AMA (27/10/2026).
 - [ ] Círculos mágicos visíveis e posicionados corretamente.
 - [ ] Magias com efeitos concretos, dano, cura e aplicação de estados
   confiáveis.
@@ -105,18 +131,18 @@ Transformar o WorldBox em um mundo de fantasia com progressão emergente:
 ### Tarefas
 
 - [ ] Abrir o workspace no VS Code e configurar C# e .NET SDK.
-- [ ] Localizar `worldbox.exe`, `Assembly-CSharp.dll`, módulos Unity e
+- [x] Localizar `worldbox.exe`, `Assembly-CSharp.dll`, módulos Unity e
   DLLs do NML no computador de teste.
-- [ ] Confirmar as assinaturas reais das APIs de `Actor`, `ActorTrait`,
+- [x] Confirmar as assinaturas reais das APIs de `Actor`, `ActorTrait`,
   dano, posição, equipamento e callbacks.
-- [ ] Corrigir erros de compilação identificados no log; substituir
-  reflexão frágil por API direta quando comprovada.
+- [x] Corrigir erros de compilação identificados no log.
+- [ ] Substituir reflexão frágil por API direta quando comprovada.
 - [ ] Definir repositório Git, branches, convenções, changelog e tags de
   versão.
-- [ ] Automatizar validação estática do catálogo e compilação quando
+- [x] Automatizar validação estática do catálogo e compilação quando
   possível.
-- [ ] Criar um mundo descartável de teste e guardar backups dos saves.
-- [ ] Registrar versões exatas do jogo, loader e dependências no
+- [x] Criar um mundo descartável de teste e guardar backups dos saves.
+- [x] Registrar versões exatas do jogo, loader e dependências no
   relatório de teste.
 
 **Entregáveis:** ambiente VS Code funcional, compilação reproduzível,

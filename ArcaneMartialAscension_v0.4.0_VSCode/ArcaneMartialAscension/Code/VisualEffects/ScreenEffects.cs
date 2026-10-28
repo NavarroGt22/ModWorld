@@ -24,6 +24,22 @@ namespace ArcaneMartialAscension.VisualEffects
         private static readonly List<Effect> live = new List<Effect>();
         private static Texture2D circle, slash, aura, bolt;
         private static float lastCombatFx;
+        public sealed class Flight
+        {
+            public Vector3 From,To;
+            public float Progress;
+            public Color Tint;
+        }
+        private static readonly List<Flight> flights=new List<Flight>();
+
+        public static Flight Launch(Vector3 from,Vector3 to,Color tint)
+        {
+            Ensure();
+            Flight flight=new Flight{From=from,To=to,Tint=tint};
+            if(flights.Count<128)flights.Add(flight);
+            return flight;
+        }
+        public static void Finish(Flight flight){flights.Remove(flight);}
 
         private static Texture2D Make(int kind)
         {
@@ -48,7 +64,8 @@ namespace ArcaneMartialAscension.VisualEffects
                 else if(kind==1) ink = a>-.85f && a<1.8f && Mathf.Abs(r-(45+3*Mathf.Sin(a*2f)))<4;
                 else if(kind==2) ink = Mathf.Abs(r-47)<3 || Mathf.Abs(r-32)<1.6f ||
                         (r>31 && r<51 && Mathf.Abs(Mathf.Sin(a*6))<.12f);
-                else ink = r<6 || (Mathf.Abs(dx)<2 && Mathf.Abs(dy)<38);
+                else ink = r<13 || (Mathf.Abs(dx)<6 && Mathf.Abs(dy)<40) ||
+                    (Mathf.Abs(dy)<6 && Mathf.Abs(dx)<26);
                 pixels[y*size+x] = ink ? new Color32(255,255,255,255) : new Color32(0,0,0,0);
             }
             tex.SetPixels32(pixels);
@@ -84,8 +101,7 @@ namespace ArcaneMartialAscension.VisualEffects
         {
             if(e.HasWorld)
             {
-                Camera c=Camera.main;
-                if(c==null && Camera.allCamerasCount>0) c=Camera.allCameras[0];
+                Camera c=GameCompat.MapCamera;
                 if(c!=null)
                 {
                     Vector3 p=c.WorldToScreenPoint(e.World);
@@ -98,8 +114,29 @@ namespace ArcaneMartialAscension.VisualEffects
         }
         public static void Draw()
         {
-            if(live.Count==0) return;
+            if(live.Count==0 && flights.Count==0) return;
             Ensure();
+            GUI.depth=-1000;
+            Camera camera=GameCompat.MapCamera;
+            if(camera!=null)
+            foreach(Flight flight in flights)
+            {
+                Vector3 from=camera.WorldToScreenPoint(flight.From),to=camera.WorldToScreenPoint(flight.To);
+                if(from.z<0 || to.z<0)continue;
+                Vector2 a=new Vector2(from.x,Screen.height-from.y),b=new Vector2(to.x,Screen.height-to.y);
+                Color previous=GUI.color;
+                // A visible moving head plus a short trail, anchored to the map camera.
+                for(int i=7;i>=0;i--)
+                {
+                    float t=Mathf.Max(0,flight.Progress-i*.018f);
+                    Vector2 point=Vector2.Lerp(a,b,t);
+                    float size=i==0?22f:Mathf.Max(4f,15f-i);
+                    Color tint=flight.Tint;tint.a=i==0?1f:.7f-i*.065f;
+                    GUI.color=tint;
+                    GUI.DrawTexture(new Rect(point.x-size*.5f,point.y-size*.5f,size,size),bolt);
+                }
+                GUI.color=previous;
+            }
             for(int i=live.Count-1;i>=0;i--)
             {
                 Effect e=live[i];
@@ -127,6 +164,7 @@ namespace ArcaneMartialAscension.VisualEffects
         public static void Clear()
         {
             live.Clear();
+            flights.Clear();
             if(circle!=null) UnityEngine.Object.Destroy(circle);
             if(slash!=null) UnityEngine.Object.Destroy(slash);
             if(aura!=null) UnityEngine.Object.Destroy(aura);

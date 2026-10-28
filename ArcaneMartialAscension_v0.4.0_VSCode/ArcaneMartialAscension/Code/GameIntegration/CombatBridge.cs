@@ -4,85 +4,38 @@ using UnityEngine;
 
 namespace ArcaneMartialAscension.GameIntegration
 {
-    // Isolates unverified game internals instead of referring to removed members at compile time.
-    // Damage fallback changes existing current HP but intentionally never forces death/kill attribution.
+    // Native WorldBox 0.51.2 combat. Success requires a measured change in health.
     public static class CombatBridge
     {
         private const BindingFlags Flags = BindingFlags.Public|BindingFlags.NonPublic|BindingFlags.Instance;
-        private static object Read(object instance,string name)
+        private static float nextTraitWarning;
+        public static bool TryDamage(Actor target,float amount,Actor attacker=null)
         {
-            if(instance==null) return null;
+            if(target==null || !target.isAlive() || amount<=0 || float.IsNaN(amount) || float.IsInfinity(amount))return false;
             try
             {
-                PropertyInfo prop=instance.GetType().GetProperty(name,Flags);
-                if(prop!=null && prop.GetIndexParameters().Length==0) return prop.GetValue(instance,null);
-                FieldInfo field=instance.GetType().GetField(name,Flags);
-                if(field!=null) return field.GetValue(instance);
+                int before=target.getHealth();
+                // Do not skip a spell just because a normal attack is shaking the victim.
+                // Native damage keeps armor, get-hit hooks, death handling and attacker credit.
+                target.getHit(amount,true,AttackType.Other,attacker,false,false,true);
+                return target.getHealth()<before;
             }
-            catch(Exception) { }
-            return null;
-        }
-        private static bool WriteNumber(object instance,string fieldName,float value)
-        {
-            if(instance==null) return false;
-            try
+            catch(Exception error)
             {
-                FieldInfo f=instance.GetType().GetField(fieldName,Flags);
-                if(f!=null && !f.IsInitOnly && IsNumber(f.FieldType))
-                {f.SetValue(instance,Convert.ChangeType(value,f.FieldType));return true;}
-                PropertyInfo p=instance.GetType().GetProperty(fieldName,Flags);
-                if(p!=null && p.CanWrite && IsNumber(p.PropertyType))
-                {p.SetValue(instance,Convert.ChangeType(value,p.PropertyType),null);return true;}
+                Debug.LogError("[AMA Combat] Falha no dano nativo: "+error);
+                return false;
             }
-            catch(Exception) { }
-            return false;
-        }
-        private static bool IsNumber(Type t)
-        {return t==typeof(float)||t==typeof(double)||t==typeof(int)||t==typeof(short);}
-        private static bool Number(object obj,out float value)
-        {
-            value=0f;
-            try {if(obj!=null) {value=Convert.ToSingle(obj);return !float.IsNaN(value);}}catch(Exception) { }
-            return false;
-        }
-        public static bool TryDamage(Actor target,float amount)
-        {
-            if(target==null || !target.isAlive() || amount<=0) return false;
-            // Exact, narrow one-parameter calls only; we do NOT blindly invoke arbitrary overloads.
-            string[] names={"getHit","takeDamage","receiveDamage","damage"};
-            foreach(string n in names)
-            {
-                MethodInfo[] methods=target.GetType().GetMethods(Flags);
-                foreach(MethodInfo method in methods)
-                {
-                    if(method.Name!=n) continue;
-                    ParameterInfo[] p=method.GetParameters();
-                    if(p.Length!=1 || !IsNumber(p[0].ParameterType)) continue;
-                    try {method.Invoke(target,new object[]{Convert.ChangeType(amount,p[0].ParameterType)});return true;}
-                    catch(Exception) { }
-                }
-            }
-            // Conservative fallback: reduce current ActorData.health, stop at 1 HP to avoid bypassing death flow.
-            object data=Read(target,"data");
-            float health;
-            if(Number(Read(data,"health"),out health) && health>1f)
-            {
-                float remaining=Mathf.Max(1f,health-amount);
-                return WriteNumber(data,"health",remaining);
-            }
-            return false;
         }
         public static bool TryHeal(Actor target,float amount)
         {
-            if(target==null || !target.isAlive() || amount<=0) return false;
-            object data=Read(target,"data");
-            float current;
-            if(!Number(Read(data,"health"),out current)) return false;
-            float max;
-            if(!Number(Read(data,"max_health"),out max))
-                if(!Number(Read(data,"health_max"),out max)) return false;
-            if(max<=current) return true;
-            return WriteNumber(data,"health",Mathf.Min(max,current+amount));
+            if(target==null || !target.isAlive() || amount<=0 || float.IsNaN(amount) || float.IsInfinity(amount))return false;
+            try
+            {
+                int before=target.getHealth();
+                target.restoreHealth(Mathf.CeilToInt(amount));
+                return target.getHealth()>before;
+            }
+            catch(Exception error){Debug.LogError("[AMA Combat] Falha na cura nativa: "+error);return false;}
         }
         public static bool TryStatus(Actor target,string name,float duration)
         {
@@ -102,15 +55,19 @@ namespace ArcaneMartialAscension.GameIntegration
         }
         public static bool RemoveTrait(Actor actor,string id)
         {
-            if(actor==null) return false;
-            foreach(MethodInfo m in actor.GetType().GetMethods(Flags))
+            if(actor==null || string.IsNullOrEmpty(id))return false;
+            try
             {
-                if(m.Name!="removeTrait" || m.GetParameters().Length!=1 ||
-                   m.GetParameters()[0].ParameterType!=typeof(string)) continue;
-                try {m.Invoke(actor,new object[]{id}); actor.setStatsDirty();return true;}
-                catch(Exception){return false;}
+                actor.removeTrait(id);
+                actor.setStatsDirty();
+                return !actor.hasTrait(id);
             }
-            return false;
+            catch(Exception error)
+            {
+                if(Time.unscaledTime>=nextTraitWarning)
+                {nextTraitWarning=Time.unscaledTime+10f;Debug.LogWarning("[AMA Traits] Não foi possível remover "+id+": "+error);}
+                return false;
+            }
         }
     }
 }

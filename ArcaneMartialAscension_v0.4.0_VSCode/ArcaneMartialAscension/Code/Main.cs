@@ -6,6 +6,8 @@ using ArcaneMartialAscension.Core;
 using ArcaneMartialAscension.Spells;
 using ArcaneMartialAscension.GameIntegration;
 using ArcaneMartialAscension.VisualEffects;
+using ArcaneMartialAscension.UI;
+using MartialWeaponType = ArcaneMartialAscension.Core.WeaponType;
 
 namespace ArcaneMartialAscension
 {
@@ -19,8 +21,9 @@ namespace ArcaneMartialAscension
         private static readonly string[] SchoolNames={"Abjuracao","Conjuracao","Adivinhacao","Encantamento","Evocacao","Ilusao","Necromancia","Transmutacao"};
         private static readonly string[] WeaponNames={"Espada","Lanca","Arco","Machado"};
         private bool traitsReady;
-        private bool panelVisible=true;
+        private bool panelVisible=false;
         private bool autoWeapons=true;
+        private bool autoLearning=true;
         private string status="Iniciando...";
 
         protected override void OnModLoad()
@@ -41,6 +44,7 @@ namespace ArcaneMartialAscension
         }
         private void Start()
         {
+            gameObject.AddComponent<CharacterPanels>().Initialize(PrepareSpell);
             try
             {
                 Visuals=gameObject.AddComponent<CombatVisualController>();
@@ -54,6 +58,7 @@ namespace ArcaneMartialAscension
         }
         private void Update()
         {
+            AutonomousLearningAgent.Update(autoLearning);
             if(Input.GetKeyDown(KeyCode.F5)) ScreenEffects.Test();
             if(Input.GetKeyDown(KeyCode.F6)) panelVisible=!panelVisible;
             if(Input.GetKeyDown(KeyCode.F7)) PickActor();
@@ -62,14 +67,14 @@ namespace ArcaneMartialAscension
             if(Input.GetKeyDown(KeyCode.F10)) Aura();
             if(Input.GetKeyDown(KeyCode.F11)) weaponIndex=(weaponIndex+1)%4;
             if(Input.GetKeyDown(KeyCode.F12)) TrainMagic();
+            ActorAbilities.UpdateMagic();
             if(autoWeapons) ActorAbilities.AutoDiscoverWeapons();
             ActorAbilities.Cleanup();
         }
         private Actor NearestAtCursor(bool excludeSelected)
         {
             if(World.world==null)return null;
-            Camera camera=Camera.main;
-            if(camera==null && Camera.allCamerasCount>0)camera=Camera.allCameras[0];
+            Camera camera=GameCompat.MapCamera;
             if(camera==null)return null;
             Actor best=null;
             float closest=excludeSelected?110f*110f:140f*140f;
@@ -97,6 +102,8 @@ namespace ArcaneMartialAscension
         }
         private bool Selected()
         {
+            Actor inspected=SelectedUnit.unit;
+            if(inspected!=null && inspected.isAlive()) selected=inspected;
             if(selected!=null && selected.isAlive())return true;
             PickActor();
             return selected!=null && selected.isAlive();
@@ -115,6 +122,16 @@ namespace ArcaneMartialAscension
         }
         private void ChangeSpell(int delta)
         {spellIndex=(spellIndex+delta+20)%20;}
+        private void PrepareSpell(Actor actor,SpellEntry spell)
+        {
+            if(actor==null || !actor.isAlive() || spell==null)return;
+            selected=actor;
+            schoolIndex=(int)spell.School;
+            spellIndex=SpellCatalog.School(spell.School).IndexOf(spell);
+            ActorAbilities.PrepareForCombat(actor,spell);
+            status="Preparada: "+spell.Name+". Aponte para o alvo e pressione F8.";
+            LogInfo("AMA: "+status);
+        }
         private void Cast()
         {
             if(!Selected())return;
@@ -131,7 +148,7 @@ namespace ArcaneMartialAscension
         private void Weapon()
         {
             if(!Selected())return;
-            WeaponType type=(WeaponType)weaponIndex;
+            MartialWeaponType type=(MartialWeaponType)weaponIndex;
             ActorAbilities.TriggerWeapon(selected,type);
             status="Treino: "+ActorAbilities.WeaponStatus(selected,type);
         }
@@ -151,10 +168,15 @@ namespace ArcaneMartialAscension
         {
             // Always draw fallback effects, even when the options panel is hidden.
             ScreenEffects.Draw();
+            if(Time.unscaledTime<ActorAbilities.MessageUntil && !string.IsNullOrEmpty(ActorAbilities.LastMessage))
+            {
+                float width=Mathf.Min(620,Screen.width-24);
+                GUI.Box(new Rect((Screen.width-width)*.5f,12,width,48),ActorAbilities.LastMessage);
+            }
             if(!panelVisible)return;
             int x=Screen.width-425;
             if(x<5)x=5;
-            GUI.Box(new Rect(x,30,414,435),"Arcane & Martial Ascension 0.4 ALPHA");
+            GUI.Box(new Rect(x,30,414,490),"Arcane & Martial Ascension 0.4 ALPHA");
             GUI.Label(new Rect(x+10,52,396,19),traitsReady?
                 "Catalogo 160 magias | 4 armas | Tracos OK" : "Tracos falharam: Player.log");
             GUI.Label(new Rect(x+10,74,393,34),status);
@@ -186,15 +208,19 @@ namespace ArcaneMartialAscension
             GUI.Label(new Rect(x+183,312,221,22),"F11 troca arma | F6 oculta");
             autoWeapons=GUI.Toggle(new Rect(x+9,339,393,24),autoWeapons,
                 "Detectar armas dos NPCs automaticamente (experimental)");
+            autoLearning=GUI.Toggle(new Rect(x+9,367,393,24),autoLearning,
+                "IA: aprender magias e treinar armas (experimental)");
             if(selected!=null && selected.isAlive())
             {
-                GUI.Label(new Rect(x+10,368,393,23),ActorAbilities.Status(selected));
-                GUI.Label(new Rect(x+10,392,393,24),
-                    ActorAbilities.WeaponStatus(selected,(WeaponType)weaponIndex));
+                GUI.Label(new Rect(x+10,397,393,23),ActorAbilities.Status(selected));
+                GUI.Label(new Rect(x+10,423,393,24),
+                    ActorAbilities.WeaponStatus(selected,(MartialWeaponType)weaponIndex));
+                GUI.Label(new Rect(x+10,452,393,46),ActorAbilities.LearningStatusForDisplay(selected));
             }
         }
         private void OnDestroy()
         {
+            ActorAbilities.ResetRuntimeForWorld();
             ScreenEffects.Clear();
             Visuals=null;
         }

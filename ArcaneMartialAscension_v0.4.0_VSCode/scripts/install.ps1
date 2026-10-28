@@ -2,9 +2,18 @@ param([string]$GamePath = '', [switch]$NoBackup)
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'common.ps1')
 $root = Resolve-WorldBoxRoot -GamePath $GamePath
+if (Get-Process -Name worldbox -ErrorAction SilentlyContinue) {
+    throw 'Feche o WorldBox antes de instalar para evitar trocar fontes durante o carregamento.'
+}
 $mods = Resolve-ModsFolder -Root $root
 $source = Join-Path $PSScriptRoot '..\ArcaneMartialAscension'
-$destination = Join-Path $mods 'ArcaneMartialAscension'
+$destination = [IO.Path]::GetFullPath((Join-Path $mods 'ArcaneMartialAscension'))
+$resolvedMods = [IO.Path]::GetFullPath($mods).TrimEnd('\')
+if ([IO.Path]::GetDirectoryName($destination) -ine $resolvedMods -or
+    [IO.Path]::GetFileName($destination) -ne 'ArcaneMartialAscension' -or
+    $destination -ieq [IO.Path]::GetFullPath($source)) {
+    throw "Destino de instalacao inseguro: $destination"
+}
 if (-not (Test-Path -LiteralPath (Join-Path $source 'mod.json'))) { throw 'Arquivo mod.json ausente na origem' }
 Write-Host "Destino: $destination"
 if (Test-Path -LiteralPath $destination) {

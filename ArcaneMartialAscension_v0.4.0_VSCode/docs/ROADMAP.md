@@ -1,8 +1,15 @@
 # Roadmap técnico
 
+**Estado atual — 27/10/2026:** v0.4.0 Alpha, Fase 1 em validação no roadmap
+completo. Compilação, carga inicial e F5 confirmados; última correção de magia
+ainda sem aceite de combate. Maestria e aprendizado autônomo têm protótipos
+em código, com 24 cenários de regras aprovados. Persistência pendente.
+Ver `VALIDACAO_APRENDIZADO.md` e a seção de estado do roadmap completo.
+
 ## Etapa A — Compatibilidade 0.51.2 (bloqueador)
-- [ ] Compilar sem warnings críticos/erros com NeoModLoader 1.2.1.1 e `Assembly-CSharp` correto.
-- [ ] Confirmar `OnModLoad`, registro de escolas/traços e callbacks de ataque.
+- [x] Compilar sem warnings críticos/erros com NeoModLoader 1.2.1.1 e `Assembly-CSharp` correto. Evidência: `VALIDACAO_FASE_0.md`.
+- [x] Confirmar `OnModLoad` e registro inicial de escolas/traços (log e painel na Fase 0).
+- [ ] Validar callbacks de ataque e suas consequências em combate real.
 - [ ] Resolver posição real de Actor e seleção visual de unidade.
 
 ## Etapa B — Funcionalidade demonstrável

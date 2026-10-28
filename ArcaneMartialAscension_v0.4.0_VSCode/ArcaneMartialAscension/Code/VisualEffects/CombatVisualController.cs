@@ -10,6 +10,7 @@ namespace ArcaneMartialAscension.VisualEffects
         private Sprite circleSprite;
         private Sprite swordSprite;
         private Sprite auraSprite;
+        private Sprite boltSprite;
         private int activeEffects;
         private const int MaxEffects = 48;
 
@@ -18,6 +19,21 @@ namespace ArcaneMartialAscension.VisualEffects
             circleSprite = MakeSprite(96, 0);
             swordSprite = MakeSprite(96, 1);
             auraSprite = MakeSprite(96, 2);
+            boltSprite = MakeSprite(64, 3);
+        }
+
+        public Transform SpawnBolt(Vector3 point,Color color)
+        {
+            if(boltSprite==null || activeEffects>=MaxEffects)return null;
+            GameObject fx=new GameObject("AMA_SpellProjectile");
+            fx.transform.SetParent(transform,false);
+            fx.transform.position=point;
+            fx.transform.localScale=Vector3.one*.6f;
+            SpriteRenderer sprite=fx.AddComponent<SpriteRenderer>();
+            sprite.sprite=boltSprite;sprite.color=color;sprite.sortingOrder=32001;
+            fx.AddComponent<FxSpriteAnimation>().Initialize(this,sprite,3f,260f,0f,color);
+            activeEffects++;
+            return fx.transform;
         }
 
         public void SpawnCircle(Vector3 center, int circle, Color color)
@@ -99,13 +115,15 @@ namespace ArcaneMartialAscension.VisualEffects
                         float edge = 27f + 4f * Mathf.Sin((angle + 0.72f) * 1.2f);
                         visible = inSweep && Mathf.Abs(distance - edge) < 3.5f;
                     }
-                    else
+                    else if(kind==2)
                     {
                         // Expanding aura wave, with four spokes.
                         visible = Mathf.Abs(distance - 33f) < 2.4f ||
                             (Mathf.Abs(distance - 25f) < 1.3f &&
                              Mathf.Abs(Mathf.Sin(angle * 4f)) < 0.25f);
                     }
+                    else visible=distance<8f || (Mathf.Abs(dx)<2.5f && Mathf.Abs(dy)<25f) ||
+                        (Mathf.Abs(dy)<2.5f && Mathf.Abs(dx)<20f);
                     pixels[y * size + x] = visible
                         ? new Color32(255, 255, 255, 255)
                         : new Color32(0, 0, 0, 0);
@@ -122,6 +140,7 @@ namespace ArcaneMartialAscension.VisualEffects
             if (circleSprite != null) { Destroy(circleSprite.texture); Destroy(circleSprite); }
             if (swordSprite != null) { Destroy(swordSprite.texture); Destroy(swordSprite); }
             if (auraSprite != null) { Destroy(auraSprite.texture); Destroy(auraSprite); }
+            if (boltSprite != null) { Destroy(boltSprite.texture); Destroy(boltSprite); }
         }
     }
 

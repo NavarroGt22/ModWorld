@@ -75,6 +75,14 @@ namespace ArcaneMartialAscension.GameIntegration
         {
             position = Vector3.zero;
             if (actorOrTile == null) return false;
+            // Confirmed in 0.51.2: this is the position used by Actor.updatePos/rendering.
+            BaseSimObject sim=actorOrTile as BaseSimObject;
+            if(sim!=null)
+            {
+                position=sim.cur_transform_position;
+                position.z=0f;
+                return !float.IsNaN(position.x) && !float.IsNaN(position.y);
+            }
             // Try direct coordinates / Unity-type Vector3 first.
             if (ToVector(actorOrTile, out position)) return true;
             string[] direct = { "currentPosition", "current_position", "position", "pos", "position_vec3", "position_real" };
@@ -102,6 +110,11 @@ namespace ArcaneMartialAscension.GameIntegration
                 Debug.LogWarning("[AMA 0.3.3] Actor position not found. Please send Player.log. Type=" + actorOrTile.GetType().FullName);
             }
             return false;
+        }
+
+        public static Camera MapCamera
+        {
+            get { return World.world!=null && World.world.camera!=null?World.world.camera:Camera.main; }
         }
 
         public static Vector3 PositionOrCursor(object target)

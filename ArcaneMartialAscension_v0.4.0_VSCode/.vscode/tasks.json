@@ -34,6 +34,15 @@
       "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\logs.ps1" ],
       "problemMatcher": [],
       "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "AMA: 5 - Testar aprendizado e maestrias",
+      "type": "shell",
+      "command": "powershell.exe",
+      "args": [ "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "${workspaceFolder}\\scripts\\test-learning.ps1" ],
+      "problemMatcher": [ "$msCompile" ],
+      "group": "test",
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
     }
   ]
 }
